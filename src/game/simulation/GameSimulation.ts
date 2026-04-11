@@ -15,12 +15,13 @@ import {
   POST_HIT_COOLDOWN_MS,
   SATIATION_DRAIN_PER_SECOND,
   SATIATION_MAX,
+  SHIP_LANE_JITTER,
   SPAWN_PADDING,
   WORLD_WIDTH
 } from "./config";
 import { createInitialState, createInitialWormState } from "./createState";
 
-const MAX_SHIPS_BY_TIER = [1, 2, 2, 3, 3];
+const MAX_SHIPS_BY_TIER = [2, 3, 3, 4, 5];
 
 type Listener = (state: Readonly<GameState>) => void;
 
@@ -79,12 +80,14 @@ export class GameSimulation {
       return;
     }
 
-    this.state.elapsedMs += deltaMs;
+    const safeDeltaMs = Math.min(deltaMs, 50);
+
+    this.state.elapsedMs += safeDeltaMs;
     this.state.difficultyTier = Math.floor(
       this.state.elapsedMs / DIFFICULTY_STEP_MS
     );
 
-    const drain = (SATIATION_DRAIN_PER_SECOND * deltaMs) / 1000;
+    const drain = (SATIATION_DRAIN_PER_SECOND * safeDeltaMs) / 1000;
     this.state.satiation = Math.max(0, this.state.satiation - drain);
 
     if (this.state.satiation <= 0) {
@@ -94,9 +97,9 @@ export class GameSimulation {
       return;
     }
 
-    this.updateShips(deltaMs);
-    this.updateSpawn(deltaMs);
-    this.updateWorm(deltaMs);
+    this.updateShips(safeDeltaMs);
+    this.updateSpawn(safeDeltaMs);
+    this.updateWorm(safeDeltaMs);
     this.emit();
   }
 
@@ -173,32 +176,15 @@ export class GameSimulation {
       worm.tipX = Phaser.Math.Linear(worm.anchorX, worm.targetX, progress);
       worm.tipY = Phaser.Math.Linear(worm.anchorY, worm.targetY, progress);
 
-      if (progress >= 1) {
-        const ship = worm.targetShipId
-          ? this.state.activeShips.find(
-              (candidate) => candidate.id === worm.targetShipId
-            )
-          : undefined;
+      if (
+        progress >= worm.contactWindowStartsAt &&
+        this.tryCaptureTargetShip(worm)
+      ) {
+        return;
+      }
 
-        if (ship && this.canHitShip(ship, worm.tipX, worm.tipY)) {
-          const archetype = this.getArchetype(ship.archetypeId);
-          this.state.score += archetype.scoreValue;
-          this.state.satiation = Math.min(
-            SATIATION_MAX,
-            this.state.satiation + archetype.satiationValue
-          );
-          this.state.activeShips = this.state.activeShips.filter(
-            (candidate) => candidate.id !== ship.id
-          );
-          worm.didHit = true;
-          worm.attackPhase = "biting";
-          worm.strikeElapsedMs = 0;
-          worm.strikeDurationMs = HIT_BITE_HOLD_MS;
-        } else {
-          worm.didHit = false;
-          worm.attackPhase = "retracting";
-          worm.strikeElapsedMs = 0;
-        }
+      if (progress >= 1) {
+        this.startMissRetract(worm);
       }
 
       return;
@@ -229,12 +215,14 @@ export class GameSimulation {
         worm.targetY = worm.anchorY;
         worm.strikeElapsedMs = 0;
         worm.strikeDurationMs = 0;
+        worm.hasContactThisStrike = false;
 
         if (worm.didHit) {
           worm.attackPhase = "idle";
           worm.cooldownMs = POST_HIT_COOLDOWN_MS;
           worm.didHit = false;
         } else {
+          this.releaseTargetedShip();
           this.state.satiation = Math.max(
             0,
             this.state.satiation - MISS_PENALTY
@@ -282,6 +270,7 @@ export class GameSimulation {
     worm.strikeElapsedMs = 0;
     worm.strikeDurationMs = Phaser.Math.Clamp(distance * 0.48, 180, 360);
     worm.didHit = false;
+    worm.hasContactThisStrike = false;
 
     this.state.activeShips = this.state.activeShips.map((candidate) =>
       candidate.id === ship.id ? { ...candidate, state: "targeted" } : candidate
@@ -304,7 +293,7 @@ export class GameSimulation {
       archetypeId: archetype.id,
       lane,
       x,
-      y: lane + Phaser.Math.Between(-40, 40),
+      y: lane + Phaser.Math.Between(-SHIP_LANE_JITTER, SHIP_LANE_JITTER),
       velocityX,
       state: "flying"
     };
@@ -335,9 +324,90 @@ export class GameSimulation {
     return archetype;
   }
 
-  private canHitShip(ship: ShipInstance, x: number, y: number): boolean {
+  private tryCaptureTargetShip(worm: GameState["worm"]): boolean {
+    const ship = worm.targetShipId
+      ? this.state.activeShips.find(
+          (candidate) => candidate.id === worm.targetShipId
+        )
+      : undefined;
+
+    if (!ship) {
+      return false;
+    }
+
+    const heading = Phaser.Math.Angle.Between(
+      worm.anchorX,
+      worm.anchorY,
+      worm.targetX,
+      worm.targetY
+    );
+    const jawX = worm.tipX + Math.cos(heading) * worm.jawForwardOffsetPx;
+    const jawY = worm.tipY + Math.sin(heading) * worm.jawForwardOffsetPx;
+
+    const headContact = this.canHitShip(
+      ship,
+      worm.tipX,
+      worm.tipY,
+      worm.headContactRadiusPx
+    );
+    const jawContact = this.canHitShip(
+      ship,
+      jawX,
+      jawY,
+      worm.jawCaptureRadiusPx
+    );
+
+    if (!headContact && !jawContact) {
+      return false;
+    }
+
     const archetype = this.getArchetype(ship.archetypeId);
-    return Math.hypot(ship.x - x, ship.y - y) <= archetype.hitRadius;
+    this.state.score += archetype.scoreValue;
+    this.state.satiation = Math.min(
+      SATIATION_MAX,
+      this.state.satiation + archetype.satiationValue
+    );
+    this.state.activeShips = this.state.activeShips.filter(
+      (candidate) => candidate.id !== ship.id
+    );
+
+    worm.hasContactThisStrike = true;
+    worm.didHit = true;
+    worm.attackPhase = "biting";
+    worm.strikeElapsedMs = 0;
+    worm.strikeDurationMs = HIT_BITE_HOLD_MS;
+    worm.targetX = ship.x;
+    worm.targetY = ship.y;
+    worm.tipX = ship.x;
+    worm.tipY = ship.y;
+    return true;
+  }
+
+  private startMissRetract(worm: GameState["worm"]): void {
+    worm.didHit = false;
+    worm.attackPhase = "retracting";
+    worm.strikeElapsedMs = 0;
+    worm.strikeDurationMs = Math.max(180, worm.strikeDurationMs);
+  }
+
+  private releaseTargetedShip(): void {
+    this.state.activeShips = this.state.activeShips.map((candidate) =>
+      candidate.state === "targeted"
+        ? { ...candidate, state: "flying" }
+        : candidate
+    );
+  }
+
+  private canHitShip(
+    ship: ShipInstance,
+    x: number,
+    y: number,
+    extraRadius = 0
+  ): boolean {
+    const archetype = this.getArchetype(ship.archetypeId);
+    return (
+      Math.hypot(ship.x - x, ship.y - y) <= archetype.hitRadius + extraRadius
+    );
   }
 
   private emit(): void {

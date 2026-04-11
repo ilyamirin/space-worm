@@ -21,6 +21,7 @@ export interface ShipArchetype {
   parodyName: string;
   spriteKey: string;
   hitRadius: number;
+  renderScale: number;
   baseSpeed: number;
   scoreValue: number;
   satiationValue: number;
@@ -52,6 +53,11 @@ export interface WormState {
   strikeElapsedMs: number;
   strikeDurationMs: number;
   didHit: boolean;
+  headContactRadiusPx: number;
+  jawCaptureRadiusPx: number;
+  jawForwardOffsetPx: number;
+  hasContactThisStrike: boolean;
+  contactWindowStartsAt: number;
 }
 
 export interface GameState {

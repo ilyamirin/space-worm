@@ -98,7 +98,14 @@ export class GameplayScene extends Phaser.Scene {
 
       sprite.setPosition(ship.x, ship.y);
       sprite.setRotation(ship.velocityX > 0 ? 0 : Math.PI);
-      sprite.setScale(ship.state === "targeted" ? 1.1 : 1);
+      const scaleMultiplier = ship.state === "targeted" ? 1.1 : 1;
+      sprite.setScale(archetype.renderScale * scaleMultiplier);
+      sprite.setDepth(ship.state === "targeted" ? 56 : 52);
+      if (ship.state === "targeted") {
+        sprite.setTint(0xfff1bf);
+      } else {
+        sprite.clearTint();
+      }
     });
   }
 
