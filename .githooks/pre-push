@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+
+pnpm run verify
+pnpm run security:deps

@@ -1,0 +1,49 @@
+{
+  "name": "space-worm",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview",
+    "lint": "pnpm run lint:code && pnpm run lint:styles && pnpm run format:check && pnpm run security:code",
+    "lint:code": "eslint .",
+    "lint:styles": "stylelint \"src/**/*.css\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "security:code": "node scripts/security-check.mjs",
+    "security:deps": "pnpm audit --audit-level high",
+    "verify": "pnpm run lint && pnpm run build"
+  },
+  "dependencies": {
+    "phaser": "^3.90.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.1",
+    "eslint": "^9.25.1",
+    "eslint-plugin-security": "^3.0.1",
+    "globals": "^16.0.0",
+    "lint-staged": "^15.5.0",
+    "prettier": "^3.5.3",
+    "stylelint": "^16.18.0",
+    "stylelint-config-standard": "^38.0.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.30.1",
+    "vite": "^7.0.0"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.css": [
+      "stylelint --fix",
+      "prettier --write"
+    ],
+    "*.{html,json,md}": [
+      "prettier --write"
+    ]
+  }
+}
