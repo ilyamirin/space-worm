@@ -1,8 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <path d="M73 301c14-108 118-210 252-210 74 0 139 23 183 67-8 112-72 201-185 249-103 43-226 18-250-106z" fill="#6d534d"/>
-  <path d="M129 319c0-82 63-140 145-140 59 0 107 29 130 78-39 82-121 135-212 135-37 0-63-30-63-73z" fill="#8f6a5e"/>
-  <ellipse cx="244" cy="294" rx="109" ry="86" fill="#0a121a"/>
-  <ellipse cx="244" cy="294" rx="70" ry="51" fill="#152637"/>
-  <circle cx="380" cy="166" r="23" fill="#b89065"/>
-  <circle cx="127" cy="228" r="18" fill="#9b755d"/>
+<svg width="460" height="360" viewBox="0 0 460 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="lairCore" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(230 172) rotate(90) scale(118 138)">
+      <stop stop-color="#173A39"/>
+      <stop offset="0.48" stop-color="#0A161E"/>
+      <stop offset="1" stop-color="#04070B"/>
+    </radialGradient>
+    <linearGradient id="lairRock" x1="64" y1="76" x2="370" y2="296" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C29E88"/>
+      <stop offset="0.4" stop-color="#7C5E54"/>
+      <stop offset="1" stop-color="#24161C"/>
+    </linearGradient>
+  </defs>
+  <path d="M79 248C30 196 39 112 103 78C160 47 218 67 262 56C328 40 402 80 419 152C438 232 374 305 293 317C236 325 212 296 167 302C131 307 103 284 79 248Z" fill="url(#lairRock)"/>
+  <ellipse cx="227" cy="180" rx="136" ry="98" fill="url(#lairCore)"/>
+  <path d="M110 156C132 119 180 93 228 93C276 93 324 119 346 156" stroke="#F3D5A8" stroke-width="14" stroke-linecap="round" stroke-opacity="0.3"/>
+  <path d="M129 208C164 238 199 251 227 251C255 251 290 238 325 208" stroke="#66F3D8" stroke-width="14" stroke-linecap="round" stroke-opacity="0.18"/>
+  <circle cx="124" cy="132" r="11" fill="#FFCAA0" fill-opacity="0.34"/>
+  <circle cx="327" cy="246" r="10" fill="#9AF6FF" fill-opacity="0.28"/>
 </svg>

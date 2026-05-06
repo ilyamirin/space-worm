@@ -1,5 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <path d="M64 362c130-20 230-77 321-212 18-27 36-52 63-75-71 159-165 255-284 288-53 15-88 14-100-1z" fill="#9ec9d8" opacity=".7"/>
-  <circle cx="352" cy="171" r="57" fill="#f3d38a"/>
-  <circle cx="352" cy="171" r="28" fill="#fff4cb"/>
+<svg width="360" height="180" viewBox="0 0 360 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cometTail" x1="26" y1="92" x2="262" y2="92" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.3" stop-color="#B8F2FF" stop-opacity="0.48"/>
+      <stop offset="0.78" stop-color="#FFB9DC" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#FFDCA9" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <path d="M26 90C89 41 173 40 253 88C176 135 92 137 26 90Z" fill="url(#cometTail)"/>
+  <circle cx="275" cy="88" r="34" fill="#FFF2CE" fill-opacity="0.82"/>
+  <circle cx="275" cy="88" r="17" fill="#A8F7FF" fill-opacity="0.84"/>
 </svg>

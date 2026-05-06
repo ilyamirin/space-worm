@@ -1,5 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <path d="M66 256 266 130l176 126-176 126L66 256z" fill="#d3b87c"/>
-  <path d="M145 256 268 183l107 73-107 73-123-73z" fill="#334c65"/>
-  <path d="M310 156h84l-38 52-46-52zm0 200 46-52 38 52h-84z" fill="#8f5f5e"/>
+<svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="arrowHull" x1="30" y1="90" x2="300" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D5F7F0"/>
+      <stop offset="0.45" stop-color="#6AD8C4"/>
+      <stop offset="1" stop-color="#274C52"/>
+    </linearGradient>
+  </defs>
+  <path d="M34 95L128 52H211L288 90L211 128H128L34 95Z" fill="url(#arrowHull)"/>
+  <path d="M120 52L148 27H232L212 52H120Z" fill="#9FFCEC"/>
+  <path d="M120 128L148 153H232L212 128H120Z" fill="#3A7576"/>
+  <path d="M59 93H239" stroke="#EEFFF8" stroke-width="6" stroke-linecap="round" stroke-opacity="0.7"/>
+  <ellipse cx="188" cy="90" rx="31" ry="12" fill="#16353C"/>
+  <ellipse cx="188" cy="90" rx="18" ry="7" fill="#B6FFEF"/>
+  <path d="M287 90L314 79V101L287 90Z" fill="#74F8DE"/>
 </svg>

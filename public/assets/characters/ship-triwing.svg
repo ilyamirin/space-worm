@@ -1,6 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <path d="M255 106 372 256 255 406 138 256 255 106z" fill="#d9cec0"/>
-  <path d="M108 192 254 234 212 98 108 192zm42 223 140-78-160-41 20 119zm254-223-146 42 42-136 104 94z" fill="#8caabf"/>
-  <circle cx="255" cy="256" r="42" fill="#4d5969"/>
-  <circle cx="255" cy="256" r="18" fill="#f3d17b"/>
+<svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="triwingHull" x1="58" y1="44" x2="265" y2="138" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF1FB"/>
+      <stop offset="0.5" stop-color="#FF9CD5"/>
+      <stop offset="1" stop-color="#664A6D"/>
+    </linearGradient>
+  </defs>
+  <path d="M68 93L149 54L198 54L270 90L198 126H149L68 93Z" fill="url(#triwingHull)"/>
+  <path d="M104 88L72 43L136 72" fill="#FFC4E7"/>
+  <path d="M104 98L72 138L136 113" fill="#7B4E6B"/>
+  <path d="M180 54L223 30L209 78" fill="#FFD8EE"/>
+  <path d="M180 126L223 150L209 102" fill="#7A506E"/>
+  <ellipse cx="171" cy="90" rx="20" ry="11" fill="#4A2D4A"/>
+  <ellipse cx="171" cy="90" rx="11" ry="6" fill="#FFE6F4"/>
+  <path d="M208 90H298" stroke="#FFB9E2" stroke-width="8" stroke-linecap="round"/>
+  <path d="M296 90L315 80V100L296 90Z" fill="#FF8DD2"/>
 </svg>

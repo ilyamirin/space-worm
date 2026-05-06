@@ -22,6 +22,8 @@ export interface ShipArchetype {
   spriteKey: string;
   hitRadius: number;
   renderScale: number;
+  glowColor: number;
+  trailColor: number;
   baseSpeed: number;
   scoreValue: number;
   satiationValue: number;

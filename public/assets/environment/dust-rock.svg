@@ -1,4 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <path d="M107 322 149 179l119-73 118 53 40 121-76 109-137 25-106-92z" fill="#7f665b"/>
-  <path d="m170 298 44-79 97-35 64 75-59 84-104 16-42-61z" fill="#a07f6e"/>
+<svg width="360" height="260" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="dustRock" x1="52" y1="42" x2="276" y2="212" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D8B298"/>
+      <stop offset="0.42" stop-color="#89685A"/>
+      <stop offset="1" stop-color="#291B21"/>
+    </linearGradient>
+  </defs>
+  <path d="M44 194C18 156 40 101 90 84C124 72 149 82 181 69C224 52 278 73 304 112C334 157 307 220 258 232C215 242 189 213 151 215C102 219 66 225 44 194Z" fill="url(#dustRock)"/>
+  <path d="M102 105C138 91 182 90 225 104" stroke="#FFE0B5" stroke-width="11" stroke-linecap="round" stroke-opacity="0.26"/>
+  <circle cx="108" cy="153" r="10" fill="#9FF5FF" fill-opacity="0.18"/>
+  <circle cx="247" cy="128" r="9" fill="#FFC6E5" fill-opacity="0.14"/>
 </svg>

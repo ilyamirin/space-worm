@@ -1,7 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect x="112" y="164" width="288" height="184" rx="84" fill="#c4baa6"/>
-  <rect x="164" y="210" width="184" height="92" rx="34" fill="#53697c"/>
-  <path d="M128 204h256v36H128zm0 68h256v36H128z" fill="#e7d792"/>
-  <rect x="214" y="126" width="84" height="62" rx="22" fill="#b86b5e"/>
-  <rect x="214" y="324" width="84" height="62" rx="22" fill="#b86b5e"/>
+<svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blockadeHull" x1="46" y1="42" x2="265" y2="139" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F2FBFF"/>
+      <stop offset="0.46" stop-color="#A8CCE1"/>
+      <stop offset="1" stop-color="#556D82"/>
+    </linearGradient>
+  </defs>
+  <path d="M50 95L92 58H223L269 95L223 132H92L50 95Z" fill="url(#blockadeHull)"/>
+  <path d="M108 58L134 28H214L198 58H108Z" fill="#D6E5F0"/>
+  <path d="M108 132L134 154H214L198 132H108Z" fill="#567185"/>
+  <rect x="116" y="74" width="85" height="30" rx="14" fill="#2C4255"/>
+  <rect x="129" y="80" width="58" height="18" rx="9" fill="#A0EEFF"/>
+  <path d="M221 95H296" stroke="#D7EEFF" stroke-width="10" stroke-linecap="round"/>
+  <path d="M294 95L315 84V106L294 95Z" fill="#96D0E7"/>
+  <circle cx="92" cy="95" r="10" fill="#FAD6AA"/>
+  <circle cx="223" cy="95" r="10" fill="#FAD6AA"/>
 </svg>

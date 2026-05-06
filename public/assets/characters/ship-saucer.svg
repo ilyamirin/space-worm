@@ -1,8 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <ellipse cx="256" cy="272" rx="178" ry="76" fill="#cbc2b3"/>
-  <ellipse cx="256" cy="242" rx="95" ry="62" fill="#7db0cf"/>
-  <ellipse cx="256" cy="272" rx="138" ry="38" fill="#8d7761"/>
-  <circle cx="196" cy="272" r="14" fill="#d77459"/>
-  <circle cx="256" cy="272" r="14" fill="#f0cf78"/>
-  <circle cx="316" cy="272" r="14" fill="#d77459"/>
+<svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="saucerHull" x1="52" y1="48" x2="264" y2="138" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF4D8"/>
+      <stop offset="0.48" stop-color="#F0BA79"/>
+      <stop offset="1" stop-color="#81573C"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="165" cy="86" rx="102" ry="34" fill="url(#saucerHull)"/>
+  <ellipse cx="165" cy="76" rx="62" ry="20" fill="#C2D3E4"/>
+  <ellipse cx="165" cy="74" rx="39" ry="12" fill="#8CE6FF"/>
+  <path d="M55 90C83 109 124 120 165 120C206 120 247 109 275 90" stroke="#694734" stroke-width="8" stroke-linecap="round"/>
+  <path d="M92 66L65 49" stroke="#FFEBCB" stroke-width="7" stroke-linecap="round"/>
+  <path d="M238 66L266 49" stroke="#FFEBCB" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="92" cy="94" r="8" fill="#FFD08D"/>
+  <circle cx="237" cy="94" r="8" fill="#FFD08D"/>
+  <path d="M263 83L303 71V100L263 90" fill="#FFB275"/>
 </svg>

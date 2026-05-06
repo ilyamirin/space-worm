@@ -5,6 +5,12 @@ import type { SceneBridge, ShipInstance } from "../../game/types";
 import { ParallaxField } from "../view/ParallaxField";
 import { WormView } from "../view/WormView";
 
+interface ShipVisual {
+  sprite: Phaser.GameObjects.Image;
+  glow: Phaser.GameObjects.Ellipse;
+  trail: Phaser.GameObjects.Graphics;
+}
+
 export class GameplayScene extends Phaser.Scene {
   private bridge!: SceneBridge;
 
@@ -12,7 +18,7 @@ export class GameplayScene extends Phaser.Scene {
 
   private parallax!: ParallaxField;
 
-  private shipSprites = new Map<string, Phaser.GameObjects.Image>();
+  private shipVisuals = new Map<string, ShipVisual>();
 
   private music?: Phaser.Sound.BaseSound;
 
@@ -61,20 +67,22 @@ export class GameplayScene extends Phaser.Scene {
     this.bridge.tick(delta);
     const state = this.bridge.getState();
 
-    this.syncShips(state.activeShips);
+    this.syncShips(state.activeShips, state.elapsedMs);
     this.wormView.sync(state.worm);
     this.parallax.update(state);
     this.syncAudio(state.phase);
     this.syncFeedback(state);
   }
 
-  private syncShips(ships: readonly ShipInstance[]): void {
+  private syncShips(ships: readonly ShipInstance[], elapsedMs: number): void {
     const liveIds = new Set(ships.map((ship) => ship.id));
 
-    this.shipSprites.forEach((sprite, shipId) => {
+    this.shipVisuals.forEach((visual, shipId) => {
       if (!liveIds.has(shipId)) {
-        sprite.destroy();
-        this.shipSprites.delete(shipId);
+        visual.trail.destroy();
+        visual.glow.destroy();
+        visual.sprite.destroy();
+        this.shipVisuals.delete(shipId);
       }
     });
 
@@ -86,26 +94,80 @@ export class GameplayScene extends Phaser.Scene {
         return;
       }
 
-      let sprite = this.shipSprites.get(ship.id);
-      if (!sprite) {
-        sprite = this.add
+      let visual = this.shipVisuals.get(ship.id);
+      if (!visual) {
+        const trail = this.add.graphics().setDepth(49);
+        trail.setBlendMode(Phaser.BlendModes.ADD);
+
+        const glow = this.add
+          .ellipse(ship.x, ship.y, 180, 76, archetype.glowColor, 0.18)
+          .setDepth(50);
+        glow.setBlendMode(Phaser.BlendModes.ADD);
+
+        const sprite = this.add
           .image(ship.x, ship.y, archetype.spriteKey)
           .setDepth(52);
         sprite.setInteractive({ pixelPerfect: false, useHandCursor: true });
         sprite.setData("shipId", ship.id);
-        this.shipSprites.set(ship.id, sprite);
+
+        visual = { sprite, glow, trail };
+        this.shipVisuals.set(ship.id, visual);
       }
 
-      sprite.setPosition(ship.x, ship.y);
-      sprite.setRotation(ship.velocityX > 0 ? 0 : Math.PI);
+      const floatOffset =
+        Math.sin(elapsedMs * 0.0016 + ship.id.length + ship.lane * 0.02) * 6;
+      const dir = ship.velocityX > 0 ? 1 : -1;
+      const shipRotation = ship.velocityX > 0 ? 0 : Math.PI;
       const scaleMultiplier = ship.state === "targeted" ? 1.1 : 1;
-      sprite.setScale(archetype.renderScale * scaleMultiplier);
-      sprite.setDepth(ship.state === "targeted" ? 56 : 52);
+      const pulse = 0.72 + Math.sin(elapsedMs * 0.004 + ship.y * 0.01) * 0.12;
+      const trailLength = 96 + Math.min(46, Math.abs(ship.velocityX) * 0.09);
+      const verticalLean = Math.sin(elapsedMs * 0.002 + ship.x * 0.01) * 12;
+
+      visual.sprite.setPosition(ship.x, ship.y + floatOffset);
+      visual.sprite.setRotation(shipRotation);
+      visual.sprite.setScale(archetype.renderScale * scaleMultiplier);
+      visual.sprite.setDepth(ship.state === "targeted" ? 56 : 52);
       if (ship.state === "targeted") {
-        sprite.setTint(0xfff1bf);
+        visual.sprite.setTint(0xfff1bf);
       } else {
-        sprite.clearTint();
+        visual.sprite.clearTint();
       }
+
+      visual.glow.setPosition(ship.x - dir * 14, ship.y + floatOffset);
+      visual.glow.setScale(
+        archetype.renderScale * (1.12 + pulse * 0.24) * scaleMultiplier,
+        archetype.renderScale * (0.72 + pulse * 0.1)
+      );
+      visual.glow.setDepth(ship.state === "targeted" ? 55 : 50);
+      visual.glow.setFillStyle(
+        archetype.glowColor,
+        ship.state === "targeted" ? 0.34 : 0.16 + pulse * 0.08
+      );
+
+      visual.trail.clear();
+      visual.trail.lineStyle(
+        ship.state === "targeted" ? 8 : 6,
+        archetype.trailColor,
+        ship.state === "targeted" ? 0.28 : 0.16
+      );
+      this.strokeQuadraticTrail(
+        visual.trail,
+        ship.x - dir * 34,
+        ship.y + floatOffset,
+        ship.x - dir * (trailLength * 0.4),
+        ship.y + floatOffset + verticalLean * 0.35,
+        ship.x - dir * trailLength,
+        ship.y + floatOffset + verticalLean
+      );
+      visual.trail.fillStyle(
+        archetype.trailColor,
+        ship.state === "targeted" ? 0.22 : 0.12
+      );
+      visual.trail.fillCircle(
+        ship.x - dir * (trailLength + 8),
+        ship.y + floatOffset + verticalLean,
+        ship.state === "targeted" ? 9 : 7
+      );
     });
   }
 
@@ -140,5 +202,29 @@ export class GameplayScene extends Phaser.Scene {
 
     this.previousScore = state.score;
     this.previousPhase = state.phase;
+  }
+
+  private strokeQuadraticTrail(
+    graphics: Phaser.GameObjects.Graphics,
+    startX: number,
+    startY: number,
+    controlX: number,
+    controlY: number,
+    endX: number,
+    endY: number
+  ): void {
+    const curve = new Phaser.Curves.QuadraticBezier(
+      new Phaser.Math.Vector2(startX, startY),
+      new Phaser.Math.Vector2(controlX, controlY),
+      new Phaser.Math.Vector2(endX, endY)
+    );
+    const points = curve.getPoints(16);
+
+    graphics.beginPath();
+    graphics.moveTo(startX, startY);
+    points.forEach((point) => {
+      graphics.lineTo(point.x, point.y);
+    });
+    graphics.strokePath();
   }
 }

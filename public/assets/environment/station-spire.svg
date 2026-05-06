@@ -1,5 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <path d="M226 55h60l27 125h84l-83 52 49 224h-60l-47-180-47 180h-60l49-224-83-52h84l27-125z" fill="#c4b99f"/>
-  <circle cx="256" cy="220" r="36" fill="#7faeca"/>
-  <path d="M207 420h98l-49 35-49-35z" fill="#8f6d60"/>
+<svg width="280" height="280" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="spireBody" x1="56" y1="42" x2="220" y2="228" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ECF8FF"/>
+      <stop offset="0.5" stop-color="#9AB6D0"/>
+      <stop offset="1" stop-color="#38495C"/>
+    </linearGradient>
+  </defs>
+  <path d="M141 24L170 76L229 101L170 123L141 256L111 123L52 101L111 76L141 24Z" fill="url(#spireBody)"/>
+  <circle cx="141" cy="101" r="21" fill="#102133"/>
+  <circle cx="141" cy="101" r="11" fill="#B6F5FF"/>
+  <path d="M93 145H188" stroke="#EFF7FF" stroke-width="10" stroke-linecap="round" stroke-opacity="0.64"/>
+  <path d="M118 182H164" stroke="#EFF7FF" stroke-width="10" stroke-linecap="round" stroke-opacity="0.46"/>
 </svg>

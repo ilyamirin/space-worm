@@ -1,6 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <circle cx="256" cy="256" r="188" fill="#79a9c7"/>
-  <path d="M116 273c55-89 159-145 260-141-12 57-52 107-132 125-66 14-93 54-102 111-38-15-57-48-26-95z" fill="#7c9e59"/>
-  <path d="M204 325c48-18 81-17 132 16-27 49-80 79-138 85-28-44-27-77 6-101z" fill="#6d8f51"/>
-  <path d="M134 173c16-56 61-98 137-126-111 10-200 91-213 196 28-36 54-58 76-70z" fill="#dbe6ef" opacity=".7"/>
+<svg width="620" height="620" viewBox="0 0 620 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="planetCore" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(260 218) rotate(52) scale(312 312)">
+      <stop stop-color="#F4F9FF"/>
+      <stop offset="0.26" stop-color="#A0D5F1"/>
+      <stop offset="0.58" stop-color="#3F7DB0"/>
+      <stop offset="1" stop-color="#18365E"/>
+    </radialGradient>
+    <radialGradient id="planetHalo" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(310 310) rotate(90) scale(290)">
+      <stop stop-color="#7BE7FF" stop-opacity="0.18"/>
+      <stop offset="0.76" stop-color="#7BE7FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="310" cy="310" r="286" fill="url(#planetHalo)"/>
+  <circle cx="310" cy="310" r="236" fill="url(#planetCore)"/>
+  <path d="M144 248C198 196 290 180 362 201C430 221 462 257 487 308C429 285 377 279 323 284C254 290 198 310 143 352C126 316 126 281 144 248Z" fill="#8AE1B8" fill-opacity="0.72"/>
+  <path d="M182 378C231 346 300 334 370 343C419 349 456 365 478 392C438 439 383 464 323 472C258 481 197 461 154 423C155 406 166 391 182 378Z" fill="#E6D591" fill-opacity="0.6"/>
+  <path d="M190 160C230 122 289 107 343 117C380 123 408 137 424 157C386 169 350 186 323 211C286 244 265 279 252 326C211 300 181 260 171 214C168 194 175 175 190 160Z" fill="#EEF5FF" fill-opacity="0.38"/>
 </svg>
