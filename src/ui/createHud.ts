@@ -4,10 +4,13 @@ interface HudController {
   destroy: () => void;
 }
 
+export type UiSoundCue = "open" | "close";
+
 export function createHud(
   mountNode: HTMLElement,
   bridge: SceneBridge,
-  audioCredits: AudioCredit[]
+  audioCredits: AudioCredit[],
+  playUiSound: (cue: UiSoundCue) => void
 ): HudController {
   mountNode.innerHTML = `
     <section class="hud">
@@ -115,11 +118,13 @@ export function createHud(
   const openCredits = (): void => {
     creditsDrawer?.classList.add("credits--open");
     creditsDrawer?.setAttribute("aria-hidden", "false");
+    playUiSound("open");
   };
 
   const closeCredits = (): void => {
     creditsDrawer?.classList.remove("credits--open");
     creditsDrawer?.setAttribute("aria-hidden", "true");
+    playUiSound("close");
   };
 
   startButton?.addEventListener("click", () => bridge.dispatch("startRun"));

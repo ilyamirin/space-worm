@@ -1,5 +1,9 @@
 import Phaser from "phaser";
-import { WORM_SEGMENTS } from "../../game/simulation/config";
+import {
+  WORM_ANCHOR_X,
+  WORM_ANCHOR_Y,
+  WORM_SEGMENTS
+} from "../../game/simulation/config";
 import type { WormState } from "../../game/types";
 
 export class WormView {
@@ -23,26 +27,32 @@ export class WormView {
     this.spineGlow = scene.add.graphics().setDepth(63);
     this.spineGlow.setBlendMode(Phaser.BlendModes.ADD);
 
-    this.lair = scene.add.image(540, 1600, "asteroid-lair").setDepth(90);
+    this.lair = scene.add
+      .image(WORM_ANCHOR_X, WORM_ANCHOR_Y + 90, "asteroid-lair")
+      .setDepth(90);
 
     for (let index = 0; index < WORM_SEGMENTS; index += 1) {
       const segment = scene.add
-        .image(540, 1500, "worm-segment")
+        .image(WORM_ANCHOR_X, WORM_ANCHOR_Y, "worm-segment")
         .setDepth(65 + index * 0.2);
       this.segmentSprites.push(segment);
     }
 
-    this.head = scene.add.image(540, 1500, "worm-head").setDepth(102);
-    this.jawTop = scene.add.image(540, 1500, "worm-jaw-top").setDepth(103);
+    this.head = scene.add
+      .image(WORM_ANCHOR_X, WORM_ANCHOR_Y, "worm-head")
+      .setDepth(102);
+    this.jawTop = scene.add
+      .image(WORM_ANCHOR_X, WORM_ANCHOR_Y, "worm-jaw-top")
+      .setDepth(103);
     this.jawBottom = scene.add
-      .image(540, 1500, "worm-jaw-bottom")
+      .image(WORM_ANCHOR_X, WORM_ANCHOR_Y, "worm-jaw-bottom")
       .setDepth(103);
     this.headAura = scene.add
-      .ellipse(540, 1500, 180, 80, 0x8fffe5, 0.18)
+      .ellipse(WORM_ANCHOR_X, WORM_ANCHOR_Y, 180, 80, 0x8fffe5, 0.18)
       .setDepth(101);
     this.headAura.setBlendMode(Phaser.BlendModes.ADD);
     this.biteFlash = scene.add
-      .ellipse(540, 1500, 90, 90, 0xfff1c7, 0)
+      .ellipse(WORM_ANCHOR_X, WORM_ANCHOR_Y, 90, 90, 0xfff1c7, 0)
       .setDepth(104);
     this.biteFlash.setBlendMode(Phaser.BlendModes.ADD);
   }

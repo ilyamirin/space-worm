@@ -54,19 +54,24 @@ a {
 }
 
 #app {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 18px;
+  padding: max(12px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
 }
 
 .shell {
-  width: min(100%, 560px);
+  width: min(560px, 100%, calc((100dvh - 24px) * 9 / 16));
+  max-width: 100%;
 }
 
 .frame {
   position: relative;
   width: 100%;
+  height: min(calc(100dvh - 24px), calc(100vw * 16 / 9), 995px);
+  max-height: calc(100dvh - 24px);
   aspect-ratio: 9 / 16;
   overflow: hidden;
   border-radius: 34px;
@@ -138,7 +143,7 @@ a {
 .hud__cluster--status {
   top: 26px;
   left: 18px;
-  right: 100px;
+  right: 104px;
   justify-content: center;
   pointer-events: none;
 }
@@ -216,7 +221,7 @@ a {
 
 .satiety-ribbon {
   position: relative;
-  width: min(100%, 320px);
+  width: min(100%, 310px);
   padding: 12px 16px 14px;
   border-radius: 999px;
   background: linear-gradient(
@@ -320,8 +325,9 @@ a {
 
 .overlay__panel {
   position: relative;
-  width: min(100%, 372px);
-  padding: 24px 24px 22px;
+  width: min(100%, 356px);
+  max-width: calc(100% - 4px);
+  padding: 22px 20px 20px;
   border-radius: 30px;
   overflow: hidden;
   background:
@@ -369,9 +375,10 @@ a {
 .overlay h2 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.86rem, 5vw, 2.38rem);
-  line-height: 0.95;
+  font-size: clamp(1.68rem, 4.6vw, 2.38rem);
+  line-height: 0.98;
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 }
 
 .overlay__copy {
@@ -519,6 +526,16 @@ a {
   color: var(--text);
 }
 
+@media (max-height: 920px) {
+  .shell {
+    width: min(540px, 100%, calc((100dvh - 24px) * 9 / 16));
+  }
+
+  .frame {
+    height: min(calc(100dvh - 24px), calc(100vw * 16 / 9));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .overlay,
   .credits {
@@ -532,11 +549,14 @@ a {
   }
 
   .shell {
-    width: 100%;
+    width: min(100dvw, calc(100dvh * 9 / 16));
+    max-width: 100dvw;
   }
 
   .frame {
-    min-height: 100vh;
+    width: 100%;
+    height: min(100dvh, calc(100dvw * 16 / 9));
+    max-height: 100dvh;
     border-radius: 0;
     border: 0;
   }
@@ -548,9 +568,10 @@ a {
   }
 
   .hud__cluster--status {
-    top: 92px;
+    top: 90px;
     left: 14px;
     right: 14px;
+    justify-content: stretch;
   }
 
   .score-orb {
@@ -573,6 +594,47 @@ a {
   }
 
   .overlay {
-    padding: 20px;
+    padding: 14px;
+  }
+
+  .overlay__panel {
+    width: min(100%, 334px);
+    padding: 20px 18px 18px;
+    border-radius: 24px;
+  }
+
+  .overlay h1,
+  .overlay h2 {
+    font-size: clamp(1.46rem, 9vw, 2rem);
+  }
+
+  .overlay__copy {
+    margin-top: 12px;
+    font-size: 0.98rem;
+  }
+
+  .overlay__metrics {
+    margin: 14px 0 18px;
+  }
+
+  .overlay__metrics span {
+    font-size: 0.74rem;
+    padding: 7px 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hud__cluster--primary {
+    gap: 8px;
+  }
+
+  .score-orb {
+    min-width: 88px;
+    padding: 10px 13px 11px;
+  }
+
+  .hud-button {
+    padding: 8px 12px;
+    letter-spacing: 0.12em;
   }
 }

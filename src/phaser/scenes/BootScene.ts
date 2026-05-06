@@ -17,9 +17,9 @@ export class BootScene extends Phaser.Scene {
       this.load.svg(asset.key, asset.url, { width: 512, height: 512 });
     });
 
-    this.load.audio("music-loop", ASSET_MANIFEST.audio[0].url);
-    this.load.audio("sfx-bite", ASSET_MANIFEST.audio[1].url);
-    this.load.audio("sfx-miss", ASSET_MANIFEST.audio[2].url);
+    ASSET_MANIFEST.audio.forEach((asset) => {
+      this.load.audio(asset.key, asset.url);
+    });
     this.load.json("audio-credits", "assets/data/audioCredits.json");
   }
 

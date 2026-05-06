@@ -26,6 +26,16 @@ export class GameplayScene extends Phaser.Scene {
 
   private previousPhase = "boot";
 
+  private previousAttackPhase = "idle";
+
+  private previousSatiation = 100;
+
+  private knownShipIds = new Set<string>();
+
+  private shipPassCooldownMs = 0;
+
+  private lowSatietyCooldownMs = 0;
+
   constructor() {
     super("gameplay");
   }
@@ -61,11 +71,16 @@ export class GameplayScene extends Phaser.Scene {
 
     this.previousScore = this.bridge.getState().score;
     this.previousPhase = this.bridge.getState().phase;
+    this.previousAttackPhase = this.bridge.getState().worm.attackPhase;
+    this.previousSatiation = this.bridge.getState().satiation;
   }
 
   update(_time: number, delta: number): void {
     this.bridge.tick(delta);
     const state = this.bridge.getState();
+
+    this.shipPassCooldownMs = Math.max(0, this.shipPassCooldownMs - delta);
+    this.lowSatietyCooldownMs = Math.max(0, this.lowSatietyCooldownMs - delta);
 
     this.syncShips(state.activeShips, state.elapsedMs);
     this.wormView.sync(state.worm);
@@ -192,16 +207,53 @@ export class GameplayScene extends Phaser.Scene {
   }
 
   private syncFeedback(state: ReturnType<SceneBridge["getState"]>): void {
+    const nextShipIds = new Set(state.activeShips.map((ship) => ship.id));
+    const spawnedShips = state.activeShips.filter(
+      (ship) => !this.knownShipIds.has(ship.id)
+    );
+
+    if (spawnedShips.length > 0 && this.shipPassCooldownMs === 0) {
+      this.sound.play("sfx-ship-pass", { volume: 0.16 });
+      this.shipPassCooldownMs = 900;
+    }
+
+    if (
+      state.worm.attackPhase === "extending" &&
+      this.previousAttackPhase !== "extending"
+    ) {
+      this.sound.play("sfx-bite-windup", { volume: 0.4 });
+    }
+
     if (state.score > this.previousScore) {
-      this.sound.play("sfx-bite", { volume: 0.72 });
+      this.sound.play("sfx-bite-hit", { volume: 0.72 });
     }
 
     if (state.phase === "recovering" && this.previousPhase !== "recovering") {
-      this.sound.play("sfx-miss", { volume: 0.66 });
+      this.sound.play("sfx-bite-miss", { volume: 0.66 });
     }
 
+    if (state.phase === "gameOver" && this.previousPhase !== "gameOver") {
+      this.sound.play("sfx-game-over", { volume: 0.7 });
+    }
+
+    const crossedIntoLowSatiety =
+      state.satiation <= 25 && this.previousSatiation > 25;
+    const stillLowSatiety =
+      state.satiation <= 25 && this.previousSatiation <= 25;
+
+    if (
+      crossedIntoLowSatiety ||
+      (stillLowSatiety && this.lowSatietyCooldownMs === 0)
+    ) {
+      this.sound.play("sfx-satiety-low", { volume: 0.22 });
+      this.lowSatietyCooldownMs = 6000;
+    }
+
+    this.knownShipIds = nextShipIds;
     this.previousScore = state.score;
     this.previousPhase = state.phase;
+    this.previousAttackPhase = state.worm.attackPhase;
+    this.previousSatiation = state.satiation;
   }
 
   private strokeQuadraticTrail(
