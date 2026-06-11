@@ -25,21 +25,36 @@ export function createHud(
         </div>
       </div>
 
-      <div class="overlay overlay--visible" id="start-overlay">
-        <div class="overlay__panel overlay__panel--compact">
-          <div class="overlay__halo"></div>
-          <p class="eyebrow">Space Worm</p>
-          <h1>Hunt</h1>
-          <button class="overlay__action" id="start-button" type="button">Play</button>
+      <div class="overlay overlay--visible overlay--intro" id="start-overlay">
+        <div class="start-intro" id="start-intro" data-stage="approach">
+          <div class="start-intro__art"></div>
+          <div class="start-intro__shade"></div>
+          <div class="start-intro__spore"></div>
+          <div class="start-intro__trail"></div>
+          <div class="start-intro__crater-glow"></div>
+          <p class="start-intro__wordmark" aria-hidden="true">SPACE WORM</p>
+          <button
+            class="start-intro__play"
+            id="start-button"
+            type="button"
+            aria-label="Start game"
+          >
+            <span class="start-intro__play-core"></span>
+          </button>
         </div>
       </div>
 
-      <div class="overlay" id="gameover-overlay">
-        <div class="overlay__panel overlay__panel--danger overlay__panel--compact">
-          <div class="overlay__halo overlay__halo--danger"></div>
-          <p class="eyebrow">Game Over</p>
-          <h2 id="gameover-score">0</h2>
-          <button class="overlay__action overlay__action--danger" id="restart-button" type="button">Again</button>
+      <div class="overlay overlay--gameover" id="gameover-overlay">
+        <div class="restart-modal">
+          <div class="restart-modal__score" id="gameover-score">0</div>
+          <button
+            class="restart-modal__button"
+            id="restart-button"
+            type="button"
+            aria-label="Restart run"
+          >
+            <span class="restart-modal__icon"></span>
+          </button>
         </div>
       </div>
     </section>
@@ -51,13 +66,47 @@ export function createHud(
   const gameoverOverlay =
     mountNode.querySelector<HTMLElement>("#gameover-overlay");
   const gameoverScore = mountNode.querySelector<HTMLElement>("#gameover-score");
+  const startIntro = mountNode.querySelector<HTMLElement>("#start-intro");
   const startButton =
     mountNode.querySelector<HTMLButtonElement>("#start-button");
   const restartButton =
     mountNode.querySelector<HTMLButtonElement>("#restart-button");
+  let introTimer: number | null = null;
+  let introPlayedForReady = false;
 
-  startButton?.addEventListener("click", () => bridge.dispatch("startRun"));
-  restartButton?.addEventListener("click", () => bridge.dispatch("restartRun"));
+  const clearIntroTimer = (): void => {
+    if (introTimer !== null) {
+      window.clearTimeout(introTimer);
+      introTimer = null;
+    }
+  };
+
+  const setIntroStage = (
+    stage: "approach" | "descent" | "impact" | "ready"
+  ): void => {
+    startIntro?.setAttribute("data-stage", stage);
+  };
+
+  const playIntroSequence = (): void => {
+    clearIntroTimer();
+    startButton?.setAttribute("data-visible", "false");
+    setIntroStage("approach");
+
+    window.setTimeout(() => setIntroStage("descent"), 700);
+    window.setTimeout(() => setIntroStage("impact"), 1650);
+    introTimer = window.setTimeout(() => {
+      setIntroStage("ready");
+      startButton?.setAttribute("data-visible", "true");
+    }, 2500);
+  };
+
+  startButton?.addEventListener("click", () => {
+    clearIntroTimer();
+    bridge.dispatch("startRun");
+  });
+  restartButton?.addEventListener("click", () => {
+    bridge.dispatch("restartRun");
+  });
 
   const unsubscribe = bridge.subscribe((state) => {
     if (scoreValue) {
@@ -77,13 +126,19 @@ export function createHud(
     if (state.phase === "ready") {
       startOverlay?.classList.add("overlay--visible");
       gameoverOverlay?.classList.remove("overlay--visible");
+      if (!introPlayedForReady) {
+        introPlayedForReady = true;
+        playIntroSequence();
+      }
     } else if (state.phase === "gameOver") {
+      clearIntroTimer();
       startOverlay?.classList.remove("overlay--visible");
       gameoverOverlay?.classList.add("overlay--visible");
       if (gameoverScore) {
         gameoverScore.textContent = String(state.score);
       }
     } else {
+      clearIntroTimer();
       startOverlay?.classList.remove("overlay--visible");
       gameoverOverlay?.classList.remove("overlay--visible");
     }
@@ -91,6 +146,7 @@ export function createHud(
 
   return {
     destroy: () => {
+      clearIntroTimer();
       unsubscribe();
       mountNode.innerHTML = "";
     }
