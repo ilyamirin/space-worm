@@ -11,6 +11,18 @@ interface ShipVisual {
   trail: Phaser.GameObjects.Graphics;
 }
 
+interface ShipMotionPose {
+  offsetX: number;
+  offsetY: number;
+  rotationOffset: number;
+  scaleX: number;
+  scaleY: number;
+  glowScaleX: number;
+  glowScaleY: number;
+  glowAlphaBoost: number;
+  trailAlphaBoost: number;
+}
+
 export class GameplayScene extends Phaser.Scene {
   private bridge!: SceneBridge;
 
@@ -131,10 +143,17 @@ export class GameplayScene extends Phaser.Scene {
       const verticalLean = Math.sin(elapsedMs * 0.002 + ship.x * 0.01) * 12;
       const cueAlpha = this.getPatternCueAlpha(ship, elapsedMs);
       const patternTrailWidth = this.getTrailWidth(ship);
+      const motionPose = this.getShipMotionPose(ship);
 
-      visual.sprite.setPosition(ship.x, ship.y + floatOffset);
-      visual.sprite.setRotation(shipRotation);
-      visual.sprite.setScale(archetype.renderScale * scaleMultiplier);
+      visual.sprite.setPosition(
+        ship.x + motionPose.offsetX,
+        ship.y + floatOffset + motionPose.offsetY
+      );
+      visual.sprite.setRotation(shipRotation + motionPose.rotationOffset);
+      visual.sprite.setScale(
+        archetype.renderScale * scaleMultiplier * motionPose.scaleX,
+        archetype.renderScale * scaleMultiplier * motionPose.scaleY
+      );
       visual.sprite.setDepth(ship.state === "targeted" ? 56 : 52);
       if (ship.state === "targeted") {
         visual.sprite.setTint(0xfff1bf);
@@ -142,17 +161,23 @@ export class GameplayScene extends Phaser.Scene {
         visual.sprite.clearTint();
       }
 
-      visual.glow.setPosition(ship.x - dir * 14, ship.y + floatOffset);
+      visual.glow.setPosition(
+        ship.x - dir * 14 + motionPose.offsetX * 0.6,
+        ship.y + floatOffset + motionPose.offsetY * 0.4
+      );
       visual.glow.setScale(
-        archetype.renderScale * (1.12 + pulse * 0.24) * scaleMultiplier,
-        archetype.renderScale * (0.72 + pulse * 0.1)
+        archetype.renderScale *
+          (1.12 + pulse * 0.24) *
+          scaleMultiplier *
+          motionPose.glowScaleX,
+        archetype.renderScale * (0.72 + pulse * 0.1) * motionPose.glowScaleY
       );
       visual.glow.setDepth(ship.state === "targeted" ? 55 : 50);
       visual.glow.setFillStyle(
         archetype.glowColor,
         Math.max(
           ship.state === "targeted" ? 0.34 : 0.16 + pulse * 0.08,
-          cueAlpha
+          cueAlpha + motionPose.glowAlphaBoost
         )
       );
 
@@ -160,20 +185,55 @@ export class GameplayScene extends Phaser.Scene {
       visual.trail.lineStyle(
         ship.state === "targeted" ? patternTrailWidth + 2 : patternTrailWidth,
         archetype.trailColor,
-        ship.state === "targeted" ? 0.28 : 0.16
+        Math.min(
+          0.34,
+          (ship.state === "targeted" ? 0.28 : 0.16) + motionPose.trailAlphaBoost
+        )
       );
       this.strokeQuadraticTrail(
         visual.trail,
         ship.x - dir * 34,
-        ship.y + floatOffset,
+        ship.y + floatOffset + motionPose.offsetY * 0.3,
         ship.x - dir * (trailLength * 0.4),
         ship.y + floatOffset + verticalLean * 0.35,
         ship.x - dir * trailLength,
         ship.y + floatOffset + verticalLean
       );
+      visual.trail.lineStyle(
+        Math.max(2, patternTrailWidth * 0.42),
+        0xf3fbff,
+        ship.state === "targeted" ? 0.24 : 0.18 + motionPose.trailAlphaBoost
+      );
+      this.strokeQuadraticTrail(
+        visual.trail,
+        ship.x - dir * 26,
+        ship.y + floatOffset + motionPose.offsetY * 0.22,
+        ship.x - dir * (trailLength * 0.28),
+        ship.y + floatOffset + verticalLean * 0.22,
+        ship.x - dir * (trailLength * 0.68),
+        ship.y + floatOffset + verticalLean * 0.72
+      );
       visual.trail.fillStyle(
         archetype.trailColor,
-        ship.state === "targeted" ? 0.22 : 0.12
+        Math.min(
+          0.28,
+          (ship.state === "targeted" ? 0.22 : 0.12) +
+            motionPose.trailAlphaBoost * 0.8
+        )
+      );
+      visual.trail.fillCircle(
+        ship.x - dir * 18,
+        ship.y + floatOffset + motionPose.offsetY * 0.2,
+        ship.state === "targeted" ? 8 : 6
+      );
+      visual.trail.fillStyle(
+        0xf3fbff,
+        ship.state === "targeted" ? 0.34 : 0.24 + motionPose.trailAlphaBoost
+      );
+      visual.trail.fillCircle(
+        ship.x - dir * 12,
+        ship.y + floatOffset + motionPose.offsetY * 0.16,
+        ship.state === "targeted" ? 5 : 4
       );
       visual.trail.fillCircle(
         ship.x - dir * (trailLength + 8),
@@ -211,6 +271,99 @@ export class GameplayScene extends Phaser.Scene {
         return 7;
       default:
         return 6;
+    }
+  }
+
+  private getShipMotionPose(ship: ShipInstance): ShipMotionPose {
+    const ageSeconds = ship.ageMs / 1000;
+    const driftWave = ageSeconds * 2.2 + ship.movementPhase * 0.3;
+    const fineWave = ageSeconds * 4.8 + ship.movementPhase * 0.17;
+
+    switch (ship.archetypeId) {
+      case "falconish":
+        return {
+          offsetX: Math.sin(driftWave) * 4,
+          offsetY: Math.cos(fineWave * 0.6) * 3,
+          rotationOffset: Math.sin(driftWave * 0.7) * 0.045,
+          scaleX: 1 + Math.sin(fineWave) * 0.016,
+          scaleY: 1 - Math.sin(fineWave) * 0.012,
+          glowScaleX: 1.08,
+          glowScaleY: 1.04,
+          glowAlphaBoost: 0.05,
+          trailAlphaBoost: 0.03
+        };
+      case "saucer":
+        return {
+          offsetX: Math.sin(driftWave * 0.5) * 2,
+          offsetY: Math.cos(driftWave * 0.9) * 5,
+          rotationOffset: Math.sin(fineWave * 0.35) * 0.022,
+          scaleX: 1 + Math.sin(fineWave * 0.55) * 0.02,
+          scaleY: 1 + Math.cos(fineWave * 0.55) * 0.03,
+          glowScaleX: 1.14,
+          glowScaleY: 1.12,
+          glowAlphaBoost: 0.07,
+          trailAlphaBoost: 0.01
+        };
+      case "arrow":
+        return {
+          offsetX: Math.sin(fineWave * 0.8) * 3,
+          offsetY: Math.sin(driftWave * 1.5) * 2,
+          rotationOffset: Math.sin(driftWave * 1.1) * 0.03,
+          scaleX: 1 + Math.max(0, Math.sin(fineWave * 1.3)) * 0.05,
+          scaleY: 1 - Math.max(0, Math.sin(fineWave * 1.3)) * 0.028,
+          glowScaleX: 1.18,
+          glowScaleY: 0.98,
+          glowAlphaBoost: 0.11,
+          trailAlphaBoost: 0.07
+        };
+      case "ring":
+        return {
+          offsetX: Math.cos(driftWave * 0.8) * 3,
+          offsetY: Math.sin(driftWave * 0.8) * 3,
+          rotationOffset: Math.sin(fineWave * 0.9) * 0.038,
+          scaleX: 1 + Math.sin(fineWave * 1.4) * 0.018,
+          scaleY: 1 + Math.cos(fineWave * 1.4) * 0.018,
+          glowScaleX: 1.22,
+          glowScaleY: 1.16,
+          glowAlphaBoost: 0.09,
+          trailAlphaBoost: 0.04
+        };
+      case "triwing":
+        return {
+          offsetX: Math.sin(driftWave * 1.7) * 5,
+          offsetY: Math.cos(fineWave * 0.9) * 2,
+          rotationOffset: Math.sin(driftWave * 1.8) * 0.062,
+          scaleX: 1 + Math.sin(fineWave * 1.8) * 0.024,
+          scaleY: 1 - Math.sin(fineWave * 1.8) * 0.018,
+          glowScaleX: 1.16,
+          glowScaleY: 1.02,
+          glowAlphaBoost: 0.1,
+          trailAlphaBoost: 0.06
+        };
+      case "blockade":
+        return {
+          offsetX: Math.sin(driftWave * 0.45) * 2,
+          offsetY: Math.cos(driftWave * 0.55) * 4,
+          rotationOffset: Math.sin(driftWave * 0.45) * 0.024,
+          scaleX: 1 + Math.cos(fineWave * 0.4) * 0.018,
+          scaleY: 1 + Math.sin(fineWave * 0.4) * 0.012,
+          glowScaleX: 1.1,
+          glowScaleY: 1.08,
+          glowAlphaBoost: 0.06,
+          trailAlphaBoost: 0.025
+        };
+      default:
+        return {
+          offsetX: 0,
+          offsetY: 0,
+          rotationOffset: 0,
+          scaleX: 1,
+          scaleY: 1,
+          glowScaleX: 1,
+          glowScaleY: 1,
+          glowAlphaBoost: 0,
+          trailAlphaBoost: 0
+        };
     }
   }
 
