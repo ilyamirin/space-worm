@@ -32,8 +32,64 @@
     "downloadUrl": "https://opengameart.org/sites/default/files/kenney_interfaceSounds.zip"
   },
   {
-    "key": "sfx-ship-pass",
-    "title": "spaceEngine_003.ogg from Sci-Fi Sounds",
+    "key": "ship-engine-falconish",
+    "title": "spaceEngineSmall_001.ogg from Sci-Fi Sounds",
+    "author": "Kenney",
+    "license": "CC0 1.0",
+    "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+    "downloadUrl": "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+  },
+  {
+    "key": "ship-engine-saucer",
+    "title": "engineCircular_000.ogg from Sci-Fi Sounds",
+    "author": "Kenney",
+    "license": "CC0 1.0",
+    "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+    "downloadUrl": "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+  },
+  {
+    "key": "ship-engine-arrow",
+    "title": "spaceEngineSmall_003.ogg from Sci-Fi Sounds",
+    "author": "Kenney",
+    "license": "CC0 1.0",
+    "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+    "downloadUrl": "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+  },
+  {
+    "key": "ship-engine-ring",
+    "title": "engineCircular_003.ogg from Sci-Fi Sounds",
+    "author": "Kenney",
+    "license": "CC0 1.0",
+    "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+    "downloadUrl": "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+  },
+  {
+    "key": "ship-engine-triwing",
+    "title": "spaceEngine_001.ogg from Sci-Fi Sounds",
+    "author": "Kenney",
+    "license": "CC0 1.0",
+    "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+    "downloadUrl": "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+  },
+  {
+    "key": "ship-engine-blockade",
+    "title": "spaceEngineLarge_002.ogg from Sci-Fi Sounds",
+    "author": "Kenney",
+    "license": "CC0 1.0",
+    "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+    "downloadUrl": "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+  },
+  {
+    "key": "ship-engine-crab",
+    "title": "spaceEngineLow_001.ogg from Sci-Fi Sounds",
+    "author": "Kenney",
+    "license": "CC0 1.0",
+    "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
+    "downloadUrl": "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+  },
+  {
+    "key": "ship-engine-starfish",
+    "title": "engineCircular_004.ogg from Sci-Fi Sounds",
     "author": "Kenney",
     "license": "CC0 1.0",
     "sourceUrl": "https://kenney.nl/assets/sci-fi-sounds",
