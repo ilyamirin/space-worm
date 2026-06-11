@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import type { GameState } from "../../game/types";
 import { WORLD_HEIGHT, WORLD_WIDTH } from "../../game/simulation/config";
 import { calculateOrbitalSatellitePosition } from "./orbitalSatellite";
+import { calculatePixelCometRenderState } from "./pixelComets";
 
 interface DriftStar {
   star: Phaser.GameObjects.Ellipse;
@@ -237,18 +238,35 @@ export class ParallaxField {
       const driftX = comet.startX + comet.velocityX * ageSeconds + swayX * 0.16;
       const driftY = comet.startY + comet.velocityY * ageSeconds + swayY * 0.08;
       const shimmer =
-        0.72 + Math.max(0, Math.sin(ageSeconds * 8 + index)) * 0.24;
+        0.82 + Math.max(0, Math.sin(ageSeconds * 8 + index)) * 0.18;
+      const renderState = calculatePixelCometRenderState({
+        driftY,
+        progress,
+        shimmer
+      });
+
+      if (!renderState.alive) {
+        comet.container.destroy();
+        return false;
+      }
 
       comet.container.setPosition(driftX, driftY);
-      comet.container.setAlpha(
-        Math.max(0, Math.min(1, (1 - progress) * 0.96 + 0.12))
-      );
+      comet.container.setScale(renderState.scale);
+      comet.container.setAlpha(renderState.containerAlpha);
 
-      comet.head.setAlpha(shimmer);
-      comet.spark.setAlpha(0.56 + shimmer * 0.42);
+      comet.head.setAlpha(renderState.headAlpha);
+      comet.head.setScale(1 + renderState.burnProgress * 0.35);
+      comet.spark.setAlpha(renderState.sparkAlpha);
+      comet.spark.setScale(1 + renderState.burnProgress * 1.2);
       comet.trail.forEach((segment, segmentIndex) => {
+        segment.setScale(1 + renderState.burnProgress * 0.24);
         segment.setAlpha(
-          Math.max(0.16, shimmer * (0.58 - segmentIndex * 0.06))
+          Math.max(
+            0.08,
+            shimmer *
+              (0.76 - segmentIndex * 0.075) *
+              renderState.trailAlphaMultiplier
+          )
         );
       });
 
@@ -293,23 +311,23 @@ export class ParallaxField {
     const trail = [0, 1, 2, 3, 4, 5, 6].map((segmentIndex) =>
       this.scene.add
         .rectangle(
-          -30 - segmentIndex * 16,
+          -15 - segmentIndex * 8,
           0,
-          Math.max(10, 26 - segmentIndex * 2),
-          segmentIndex < 2 ? 10 : 8,
-          segmentIndex < 2 ? 0x8cecff : 0x5cb4ff,
-          0.62 - segmentIndex * 0.06
+          Math.max(5, 13 - segmentIndex),
+          segmentIndex < 2 ? 5 : 4,
+          segmentIndex < 2 ? 0xffffff : 0xd9f5ff,
+          0.72 - segmentIndex * 0.07
         )
         .setOrigin(0.5)
     );
 
     const head = this.scene.add
-      .rectangle(0, 0, 20, 20, 0xfbf4c7, 0.98)
+      .rectangle(0, 0, 10, 10, 0xffffff, 1)
       .setOrigin(0.5);
-    head.setStrokeStyle(1, 0x8cecff, 0.9);
+    head.setStrokeStyle(1, 0xe9fbff, 1);
 
     const spark = this.scene.add
-      .rectangle(-14, 0, 14, 14, 0x9af3ff, 0.78)
+      .rectangle(-7, 0, 7, 7, 0xf4fdff, 0.92)
       .setOrigin(0.5);
 
     container.add([...trail, spark, head]);
