@@ -1,10 +1,9 @@
 import Phaser from "phaser";
-import { ASSET_MANIFEST } from "./game/assets/manifest";
 import { WORLD_HEIGHT, WORLD_WIDTH } from "./game/simulation/config";
 import { createSceneBridge } from "./phaser/adapters/sceneBridge";
 import { BootScene } from "./phaser/scenes/BootScene";
 import { GameplayScene } from "./phaser/scenes/GameplayScene";
-import { createHud, type UiSoundCue } from "./ui/createHud";
+import { createHud } from "./ui/createHud";
 import "./styles.css";
 
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -55,21 +54,7 @@ const game = new Phaser.Game({
   }
 });
 
-const playUiSound = (cue: UiSoundCue) => {
-  const key = cue === "open" ? "sfx-ui-open" : "sfx-ui-close";
-  const volume = cue === "open" ? 0.5 : 0.42;
-
-  if ("context" in game.sound && game.sound.context?.state !== "running") {
-    void game.sound.context.resume().then(() => {
-      game.sound.play(key, { volume });
-    });
-    return;
-  }
-
-  game.sound.play(key, { volume });
-};
-
-createHud(hudRoot, bridge, ASSET_MANIFEST.audioCredits, playUiSound);
+createHud(hudRoot, bridge);
 
 const unlockAudio = () => {
   if ("context" in game.sound && game.sound.context) {

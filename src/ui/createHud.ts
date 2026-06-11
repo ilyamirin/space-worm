@@ -1,16 +1,12 @@
-import type { AudioCredit, SceneBridge } from "../game/types";
+import type { SceneBridge } from "../game/types";
 
 interface HudController {
   destroy: () => void;
 }
 
-export type UiSoundCue = "open" | "close";
-
 export function createHud(
   mountNode: HTMLElement,
-  bridge: SceneBridge,
-  audioCredits: AudioCredit[],
-  playUiSound: (cue: UiSoundCue) => void
+  bridge: SceneBridge
 ): HudController {
   mountNode.innerHTML = `
     <section class="hud">
@@ -27,9 +23,6 @@ export function createHud(
             <div class="satiety-ribbon__fill" id="satiation-fill"></div>
           </div>
         </div>
-        <button class="hud-button hud-button--icon" id="credits-toggle" type="button" aria-label="Audio credits">
-          <span class="hud-button__sound" aria-hidden="true"></span>
-        </button>
       </div>
 
       <div class="overlay overlay--visible" id="start-overlay">
@@ -49,32 +42,6 @@ export function createHud(
           <button class="overlay__action overlay__action--danger" id="restart-button" type="button">Again</button>
         </div>
       </div>
-
-      <aside class="credits" id="credits-drawer" aria-hidden="true">
-        <div class="credits__scrim" id="credits-scrim"></div>
-        <div class="credits__panel">
-          <div class="credits__glow"></div>
-          <div class="credits__header">
-            <div>
-              <p class="eyebrow">Audio Credits</p>
-              <h3>Open-source soundtrack and interface sounds</h3>
-            </div>
-            <button class="hud-button hud-button--ghost" id="credits-close" type="button">Close</button>
-          </div>
-          <ul class="credits__list">
-            ${audioCredits
-              .map(
-                (credit) => `
-                <li class="credits__item">
-                  <strong>${credit.title}</strong>
-                  <span>${credit.author} · ${credit.license}</span>
-                  <a href="${credit.sourceUrl}" target="_blank" rel="noreferrer">Source</a>
-                </li>`
-              )
-              .join("")}
-          </ul>
-        </div>
-      </aside>
     </section>
   `;
 
@@ -84,35 +51,13 @@ export function createHud(
   const gameoverOverlay =
     mountNode.querySelector<HTMLElement>("#gameover-overlay");
   const gameoverScore = mountNode.querySelector<HTMLElement>("#gameover-score");
-  const creditsDrawer = mountNode.querySelector<HTMLElement>("#credits-drawer");
-  const creditsToggle =
-    mountNode.querySelector<HTMLButtonElement>("#credits-toggle");
-  const creditsClose =
-    mountNode.querySelector<HTMLButtonElement>("#credits-close");
-  const creditsScrim =
-    mountNode.querySelector<HTMLDivElement>("#credits-scrim");
   const startButton =
     mountNode.querySelector<HTMLButtonElement>("#start-button");
   const restartButton =
     mountNode.querySelector<HTMLButtonElement>("#restart-button");
 
-  const openCredits = (): void => {
-    creditsDrawer?.classList.add("credits--open");
-    creditsDrawer?.setAttribute("aria-hidden", "false");
-    playUiSound("open");
-  };
-
-  const closeCredits = (): void => {
-    creditsDrawer?.classList.remove("credits--open");
-    creditsDrawer?.setAttribute("aria-hidden", "true");
-    playUiSound("close");
-  };
-
   startButton?.addEventListener("click", () => bridge.dispatch("startRun"));
   restartButton?.addEventListener("click", () => bridge.dispatch("restartRun"));
-  creditsToggle?.addEventListener("click", openCredits);
-  creditsClose?.addEventListener("click", closeCredits);
-  creditsScrim?.addEventListener("click", closeCredits);
 
   const unsubscribe = bridge.subscribe((state) => {
     if (scoreValue) {
