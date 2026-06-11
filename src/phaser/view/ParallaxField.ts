@@ -28,8 +28,6 @@ interface DriftObject {
 export class ParallaxField {
   private backdrop!: Phaser.GameObjects.Image;
 
-  private laneWindow!: Phaser.GameObjects.Graphics;
-
   private edgeGlow!: Phaser.GameObjects.Graphics;
 
   private stars: DriftStar[] = [];
@@ -126,10 +124,6 @@ export class ParallaxField {
     this.edgeGlow.fillEllipse(954, 1310, 200, 600);
     this.edgeGlow.fillStyle(0xd2b171, 0.006);
     this.edgeGlow.fillEllipse(540, 1810, 660, 180);
-
-    this.laneWindow = this.scene.add.graphics().setDepth(-312);
-    this.laneWindow.fillStyle(0x010204, 0.34);
-    this.laneWindow.fillRoundedRect(138, 162, 804, 1030, 140);
 
     this.createStars();
     this.createDriftObjects();
