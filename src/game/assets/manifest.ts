@@ -34,7 +34,9 @@ export const ASSET_MANIFEST: AssetManifest = {
     { key: "ship-arrow", url: `${imageBase}/characters/ship-arrow.svg` },
     { key: "ship-ring", url: `${imageBase}/characters/ship-ring.svg` },
     { key: "ship-triwing", url: `${imageBase}/characters/ship-triwing.svg` },
-    { key: "ship-blockade", url: `${imageBase}/characters/ship-blockade.svg` }
+    { key: "ship-blockade", url: `${imageBase}/characters/ship-blockade.svg` },
+    { key: "ship-crab", url: `${imageBase}/characters/ship-crab.svg` },
+    { key: "ship-starfish", url: `${imageBase}/characters/ship-starfish.svg` }
   ],
   audio: [
     { key: "music-loop", url: "assets/audio/music-loop.ogg" },

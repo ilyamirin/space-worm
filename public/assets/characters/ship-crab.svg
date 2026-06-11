@@ -1,0 +1,36 @@
+<svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="crabShell" x1="42" y1="36" x2="260" y2="142" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE2C7"/>
+      <stop offset="0.46" stop-color="#FF9F80"/>
+      <stop offset="1" stop-color="#7B3144"/>
+    </linearGradient>
+    <linearGradient id="crabClaw" x1="34" y1="38" x2="286" y2="140" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF4D8"/>
+      <stop offset="1" stop-color="#FF6E57"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 4;0 0" dur="1.08s" repeatCount="indefinite"/>
+    <path d="M56 92C76 48 133 31 196 42C239 49 272 70 286 93C266 123 228 142 174 144C109 147 68 127 56 92Z" fill="url(#crabShell)"/>
+    <path d="M84 77C116 55 185 55 235 77" stroke="#FFE8D2" stroke-width="8" stroke-linecap="round" stroke-opacity="0.62"/>
+    <ellipse cx="160" cy="93" rx="38" ry="21" fill="#311C32"/>
+    <ellipse cx="160" cy="93" rx="22" ry="12" fill="#9DEBFF">
+      <animate attributeName="opacity" values="0.65;1;0.65" dur="0.9s" repeatCount="indefinite"/>
+    </ellipse>
+    <g>
+      <animateTransform attributeName="transform" type="rotate" values="-7 82 77;9 82 77;-7 82 77" dur="1.08s" repeatCount="indefinite"/>
+      <path d="M82 77L34 42L52 81L28 116L86 100" fill="url(#crabClaw)"/>
+      <path d="M51 78L20 66L40 91L19 106" stroke="#7B3144" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <g>
+      <animateTransform attributeName="transform" type="rotate" values="8 239 79;-8 239 79;8 239 79" dur="1.08s" repeatCount="indefinite"/>
+      <path d="M229 78L289 43L264 84L302 117L229 101" fill="url(#crabClaw)"/>
+      <path d="M267 78L312 64L282 92L313 108" stroke="#7B3144" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <path d="M99 124L78 151M130 134L122 164M194 134L206 164M226 124L253 151" stroke="#FFCE9F" stroke-width="8" stroke-linecap="round"/>
+    <path d="M282 90L320 76L320 106L282 98" fill="#FF6E57">
+      <animate attributeName="opacity" values="0.35;0.9;0.35" dur="1.08s" repeatCount="indefinite"/>
+    </path>
+  </g>
+</svg>

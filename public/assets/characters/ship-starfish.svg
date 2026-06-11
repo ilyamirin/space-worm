@@ -1,0 +1,33 @@
+<svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="starCore" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(158 91) scale(92)">
+      <stop stop-color="#FFF8F0"/>
+      <stop offset="0.46" stop-color="#FFD4F1"/>
+      <stop offset="1" stop-color="#A349D4"/>
+    </radialGradient>
+    <linearGradient id="starArm" x1="54" y1="19" x2="262" y2="156" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF4D8"/>
+      <stop offset="0.5" stop-color="#F497FF"/>
+      <stop offset="1" stop-color="#6530A7"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <animateTransform attributeName="transform" type="rotate" values="-3 160 90;3 160 90;-3 160 90" dur="3.8s" repeatCount="indefinite"/>
+    <path d="M160 20L184 70L239 49L212 99L266 130L205 132L190 164L160 124L126 164L116 130L54 130L108 99L80 49L136 70L160 20Z" fill="url(#starArm)"/>
+    <path d="M160 39L178 78L219 64L198 99L236 119L192 120L184 146L160 112L132 146L126 120L84 120L122 99L101 64L142 78L160 39Z" fill="url(#starCore)"/>
+    <circle cx="160" cy="94" r="28" fill="#2B1C45"/>
+    <circle cx="160" cy="94" r="15" fill="#FFF4D8">
+      <animate attributeName="r" values="12;19;12" dur="3.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.72;1;0.72" dur="3.8s" repeatCount="indefinite"/>
+    </circle>
+    <g>
+      <animate attributeName="opacity" values="0.22;0.85;0.22" dur="3.8s" repeatCount="indefinite"/>
+      <path d="M160 18L160 64" stroke="#FFF4D8" stroke-width="7" stroke-linecap="round"/>
+      <path d="M238 48L196 80" stroke="#FFF4D8" stroke-width="6" stroke-linecap="round"/>
+      <path d="M266 130L214 113" stroke="#FFF4D8" stroke-width="6" stroke-linecap="round"/>
+      <path d="M126 164L144 116" stroke="#FFF4D8" stroke-width="6" stroke-linecap="round"/>
+      <path d="M54 130L105 113" stroke="#FFF4D8" stroke-width="6" stroke-linecap="round"/>
+    </g>
+    <path d="M244 92L320 72L294 92L320 112L244 101" fill="#F497FF" opacity="0.72"/>
+  </g>
+</svg>

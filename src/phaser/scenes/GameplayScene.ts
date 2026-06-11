@@ -258,6 +258,18 @@ export class GameplayScene extends Phaser.Scene {
         : 0;
     }
 
+    if (ship.movementPattern === "sidestepClamp") {
+      const cycleProgress = (ageSeconds + ship.movementPhase * 0.09) % 1.08;
+      return cycleProgress > 0.58 && cycleProgress < 0.74 ? 0.42 : 0;
+    }
+
+    if (ship.movementPattern === "tidalBloom") {
+      const cycleProgress = (ageSeconds + ship.movementPhase * 0.13) % 3.8;
+      return cycleProgress > 2.72 && cycleProgress < 3.32
+        ? 0.42 + Math.sin(elapsedMs * 0.018) * 0.12
+        : 0;
+    }
+
     return 0;
   }
 
@@ -269,6 +281,10 @@ export class GameplayScene extends Phaser.Scene {
         return 9;
       case "zigzagBlink":
         return 7;
+      case "sidestepClamp":
+        return Math.abs(ship.velocityX) < ship.speed * 0.5 ? 7 : 5;
+      case "tidalBloom":
+        return Math.abs(ship.velocityX) < ship.speed * 0.6 ? 9 : 6;
       default:
         return 6;
     }
@@ -351,6 +367,30 @@ export class GameplayScene extends Phaser.Scene {
           glowScaleY: 1.08,
           glowAlphaBoost: 0.06,
           trailAlphaBoost: 0.025
+        };
+      case "crab":
+        return {
+          offsetX: Math.sin(fineWave * 0.85) * 2,
+          offsetY: Math.sign(Math.sin(driftWave * 0.5)) * 3,
+          rotationOffset: Math.sin(fineWave * 0.42) * 0.028,
+          scaleX: 1 + Math.max(0, Math.sin(fineWave * 0.9)) * 0.035,
+          scaleY: 1 - Math.max(0, Math.sin(fineWave * 0.9)) * 0.018,
+          glowScaleX: 1.2,
+          glowScaleY: 1.02,
+          glowAlphaBoost: 0.08,
+          trailAlphaBoost: 0.045
+        };
+      case "starfish":
+        return {
+          offsetX: Math.sin(driftWave * 0.7) * 3,
+          offsetY: Math.cos(driftWave * 0.9) * 4,
+          rotationOffset: Math.sin(fineWave * 0.22) * 0.085,
+          scaleX: 1 + Math.max(0, Math.sin(fineWave * 0.42)) * 0.05,
+          scaleY: 1 + Math.max(0, Math.sin(fineWave * 0.42)) * 0.05,
+          glowScaleX: 1.28,
+          glowScaleY: 1.22,
+          glowAlphaBoost: 0.09,
+          trailAlphaBoost: 0.055
         };
       default:
         return {

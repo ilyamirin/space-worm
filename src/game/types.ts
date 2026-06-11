@@ -21,7 +21,9 @@ export type ShipMovementPattern =
   | "sCurve"
   | "dashStop"
   | "wideSCurve"
-  | "zigzagBlink";
+  | "zigzagBlink"
+  | "sidestepClamp"
+  | "tidalBloom";
 
 export type WormAttackPhase =
   | "idle"

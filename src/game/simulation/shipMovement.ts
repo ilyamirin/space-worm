@@ -8,6 +8,15 @@ export interface ShipPosition {
 
 const SECOND = 1000;
 
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+function smoothStep(value: number): number {
+  const clamped = clamp01(value);
+  return clamped * clamped * (3 - 2 * clamped);
+}
+
 export function calculateShipPosition(ship: ShipInstance): ShipPosition {
   const ageSeconds = ship.ageMs / SECOND;
   const forward = ship.speed * ageSeconds;
@@ -70,6 +79,42 @@ export function calculateShipPosition(ship: ShipInstance): ShipPosition {
         x: baseX + blinkOffset,
         y: ship.spawnY + zigzag,
         velocityX: ship.speed * ship.direction
+      };
+    }
+    case "sidestepClamp": {
+      const cycle = 1.08;
+      const phasedAge = ageSeconds + ship.movementPhase * 0.09;
+      const cycleProgress = phasedAge % cycle;
+      const stepIndex = Math.floor(phasedAge / cycle);
+      const sideSign = stepIndex % 2 === 0 ? 1 : -1;
+      const stepProgress = clamp01((cycleProgress - 0.18) / 0.34);
+      const easedStep = smoothStep(stepProgress);
+      const settle = cycleProgress > 0.68 ? 0.82 : 1;
+
+      return {
+        x: baseX + Math.sin(phasedAge * 1.7) * 8,
+        y:
+          ship.spawnY +
+          sideSign * 46 * easedStep * settle +
+          Math.sin(phasedAge * 7.2) * 4,
+        velocityX:
+          cycleProgress > 0.72
+            ? ship.speed * 0.38 * ship.direction
+            : ship.speed * 0.92 * ship.direction
+      };
+    }
+    case "tidalBloom": {
+      const bloomCycle = 3.8;
+      const phasedAge = ageSeconds + ship.movementPhase * 0.13;
+      const bloomProgress = phasedAge % bloomCycle;
+      const isBlooming = bloomProgress > 2.72 && bloomProgress < 3.32;
+      const petalWave = Math.sin(phasedAge * 4.4);
+      const tideWave = Math.sin(phasedAge * 1.05 + ship.movementPhase);
+
+      return {
+        x: baseX + Math.sin(phasedAge * 2.1) * 26,
+        y: ship.spawnY + tideWave * 64 + petalWave * (isBlooming ? 34 : 18),
+        velocityX: ship.speed * (isBlooming ? 0.44 : 0.82) * ship.direction
       };
     }
   }
