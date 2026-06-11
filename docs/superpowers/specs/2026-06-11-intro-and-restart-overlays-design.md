@@ -1,8 +1,9 @@
 # Space Worm Overlay Redesign
 
 Date: 2026-06-11
-Status: Approved direction
+Status: Revised approved direction
 Chosen format: `A. Cinematic Intro + Trophy Restart`
+Intro revision: `Full Motion Intro` with a single small falling spore
 
 ## Goal
 
@@ -12,6 +13,11 @@ Replace the current text-heavy start and restart overlays with:
 - a separate fast restart screen that behaves like a clean trophy modal
 
 The result should feel atmospheric on first launch and frictionless on replay.
+
+Revision note:
+
+- the intro must read as exactly one spore, not a large static spore in the sky plus a second small animated one
+- the final approved direction is a short full-motion intro over a clean crater background
 
 ## Scope
 
@@ -33,14 +39,14 @@ Out of scope:
 
 ### Start Flow
 
-The first screen becomes a short auto-playing intro built from one generated hero image plus light staged motion.
+The first screen becomes a short auto-playing mini-scene built from one generated hero background plus one animated spore actor.
 
 Narrative:
 
-1. A bright cosmic spore drifts toward the worm planet.
-2. The spore descends toward the crater on the planet surface.
-3. The spore lands in the crater and reads as the worm egg.
-4. The image settles, then the play action appears.
+1. A single small bright cosmic spore appears high in the frame.
+2. The spore travels along a readable arc toward the crater on the worm planet.
+3. The spore accelerates slightly before contact, lands in the crater, and flashes briefly.
+4. The spore disappears into the crater, the scene settles, then the play action appears.
 
 Player interaction:
 
@@ -86,8 +92,9 @@ Composition:
 
 - planet occupies the lower portion of frame
 - crater is clearly visible
-- spore is the brightest object in the upper or middle field
-- motion is mostly depth/parallax/fade/scale, not full animation
+- no large static spore should exist in the painted background
+- the only spore on screen is the animated falling one
+- the animated spore is the brightest moving object, but remains physically small in frame
 
 Visual language:
 
@@ -95,6 +102,7 @@ Visual language:
 - soft planetary glow
 - luminous spore with filament or dandelion-like structure
 - clear read that the crater is where the egg lands
+- short impact flash at the crater instead of a persistent second light source
 
 ### Restart Overlay
 
@@ -125,21 +133,20 @@ Production model:
 
 - use `replicate-nano-banana-2-http`
 - use the current gameplay backdrop or screenshot as image input
-- ask for a variant where a bright cosmic spore approaches and lands in the crater
+- ask for a variant with no spore in the sky at all, only black space, the planet, and the crater
 - keep palette continuity with the in-game planet and sky
 
 Recommended generation target:
 
 - portrait aspect ratio matching the game frame
-- one master image with enough composition space for a staged 3-beat reveal
+- one clean master image that leaves enough negative space for a small animated spore path
 
 Prompt intent:
 
 - black cosmic sky
 - earthlike small planet with readable forests, lakes, mountains
 - visible crater on the surface
-- luminous cosmic spore like a space dandelion seed
-- landing trajectory toward crater
+- no large glowing object in the upper sky
 - moody, high contrast, painterly but clean
 - consistent with existing game art
 
@@ -153,23 +160,26 @@ Target duration:
 
 Recommended stage timing:
 
-1. Stage 1, approach: `~900ms`
-2. Stage 2, descent: `~800ms`
-3. Stage 3, settle in crater: `~700ms`
-4. CTA fade-in: `~250ms`
+1. Stage 1, approach: `~700ms`
+2. Stage 2, descent: `~950ms`
+3. Stage 3, impact: `~350ms`
+4. Stage 4, settle to ready: `~500ms`
+5. CTA fade-in: `~250ms`
 
 Motion types:
 
-- subtle zoom
-- controlled vertical drift
-- light glow pulse on the spore
-- tiny atmospheric fade between states
+- one small animated spore moving on a clear arc
+- compact tail or glow streak during descent only
+- brief crater impact flash
+- subtle scene settle before CTA reveal
 
 Avoid:
 
 - busy particle storms
+- giant comet-like trails
 - long cinematic delay
 - camera shake
+- any composition that reads as two spores
 - anything that obscures tap readiness
 
 ### Restart Motion
@@ -196,7 +206,7 @@ Avoid:
 
 - intro auto-plays once whenever the app is in `ready`
 - start control appears only after the intro finishes
-- tapping before CTA appears may either queue start or be ignored; implementation should prefer explicit CTA appearance for clarity
+- tapping before CTA appears should be ignored; the CTA reveal is the explicit readiness signal
 - start control should stay large and thumb-friendly
 
 ### Restart Screen
@@ -212,9 +222,11 @@ Keep these overlays DOM-based inside the existing HUD layer.
 Recommended structure:
 
 - `start-overlay`
-  - hero image layer
+  - clean crater background image layer
   - optional logo micro-label
-  - staged spore/egg animation layers or masks
+  - single animated spore layer
+  - optional compact tail/glow layer
+  - crater impact glow layer
   - primary play control
 
 - `gameover-overlay`
@@ -235,10 +247,11 @@ This keeps layout responsive and separates cinematic surfaces from Phaser world 
 
 Recommended implementation order:
 
-1. Replace current start overlay layout and timing model
-2. Replace current restart overlay with trophy modal
-3. Generate and integrate intro hero art
-4. Tune mobile spacing and contrast
+1. Regenerate the intro background without a large spore
+2. Retune the start overlay stages to `approach`, `descent`, `impact`, `ready`
+3. Replace the current falling-spore motion with a smaller and clearer trajectory
+4. Keep the restart overlay direction as the separate trophy modal
+5. Tune mobile spacing and contrast
 
 Likely files:
 
@@ -249,13 +262,16 @@ Likely files:
 ## Risks
 
 - too much motion can make first start feel slow
+- the falling spore can become too small to read if the glow is underplayed
 - generated art may drift from the in-game palette if not grounded by reference
 - icon-only restart can become ambiguous if contrast or affordance is weak
 
 ## Acceptance Criteria
 
 - start screen reads as a short origin-story intro with almost no text
+- exactly one spore is readable on screen throughout the intro
 - the spore-to-crater idea is understandable without paragraphs
+- no large static spore remains in the background art
 - restart screen is clearly separate from the start intro
 - restart screen is faster and simpler than start
 - both overlays feel premium and mobile-safe
