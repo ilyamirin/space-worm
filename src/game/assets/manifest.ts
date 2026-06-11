@@ -15,10 +15,12 @@ export const ASSET_MANIFEST: AssetManifest = {
       key: "space-backdrop",
       url: `${imageBase}/environment/space-backdrop.jpg`
     },
+    {
+      key: "moon-satellite",
+      url: `${imageBase}/environment/moon-satellite.svg`
+    },
     { key: "asteroid-lair", url: `${imageBase}/environment/asteroid-lair.svg` },
     { key: "planet-home", url: `${imageBase}/environment/planet-home.svg` },
-    { key: "station-spire", url: `${imageBase}/environment/station-spire.svg` },
-    { key: "comet-tail", url: `${imageBase}/environment/comet-tail.svg` },
     { key: "dust-rock", url: `${imageBase}/environment/dust-rock.svg` },
     {
       key: "constellation-glyph",

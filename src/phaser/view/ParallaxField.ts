@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import type { GameState } from "../../game/types";
 import { WORLD_HEIGHT, WORLD_WIDTH } from "../../game/simulation/config";
+import { calculateOrbitalSatellitePosition } from "./orbitalSatellite";
 
 interface DriftStar {
   star: Phaser.GameObjects.Ellipse;
@@ -11,33 +12,6 @@ interface DriftStar {
   amplitude: number;
 }
 
-interface DriftObject {
-  sprite: Phaser.GameObjects.Image;
-  baseX: number;
-  baseY: number;
-  phase: number;
-  swayX: number;
-  swayY: number;
-  speed: number;
-  driftX: number;
-  driftY: number;
-  rotationRange: number;
-  baseScale: number;
-}
-
-interface PixelComet {
-  container: Phaser.GameObjects.Container;
-  head: Phaser.GameObjects.Rectangle;
-  spark: Phaser.GameObjects.Rectangle;
-  trail: Phaser.GameObjects.Rectangle[];
-  startX: number;
-  startY: number;
-  velocityX: number;
-  velocityY: number;
-  spawnAtMs: number;
-  lifetimeMs: number;
-}
-
 export class ParallaxField {
   private backdrop!: Phaser.GameObjects.Image;
 
@@ -45,13 +19,9 @@ export class ParallaxField {
 
   private stars: DriftStar[] = [];
 
-  private driftObjects: DriftObject[] = [];
-
-  private activeComets: PixelComet[] = [];
+  private moonSatellite!: Phaser.GameObjects.Image;
 
   private bottomGlow!: Phaser.GameObjects.Ellipse;
-
-  private nextCometSpawnAtMs = 7000;
 
   constructor(private scene: Phaser.Scene) {
     this.createBackdrop();
@@ -77,25 +47,7 @@ export class ParallaxField {
       entry.star.setAlpha(shimmer);
     });
 
-    this.driftObjects.forEach((entry, index) => {
-      entry.sprite.setPosition(
-        entry.baseX +
-          Math.sin(elapsed * entry.speed + index) * entry.swayX +
-          elapsed * entry.driftX +
-          swayX * 0.2,
-        entry.baseY +
-          Math.cos(elapsed * (entry.speed * 0.84) + entry.phase) * entry.swayY +
-          elapsed * entry.driftY +
-          swayY * 0.14
-      );
-      entry.sprite.setRotation(
-        Math.sin(elapsed * (entry.speed * 0.4) + index) * entry.rotationRange
-      );
-      entry.sprite.setScale(
-        entry.baseScale *
-          (1 + Math.sin(elapsed * (entry.speed * 0.32) + index) * 0.015)
-      );
-    });
+    this.updateMoonSatellite(state.elapsedMs);
 
     this.bottomGlow.setPosition(
       WORLD_WIDTH * 0.5 + swayX * 0.14,
@@ -104,8 +56,6 @@ export class ParallaxField {
     this.bottomGlow.setAlpha(
       0.08 + Math.max(0, Math.sin(elapsed * 0.3)) * 0.04
     );
-
-    this.updatePixelComets(state.elapsedMs, swayX, swayY);
   }
 
   private createBackdrop(): void {
@@ -136,6 +86,8 @@ export class ParallaxField {
       )
       .setDepth(-314);
 
+    this.coverBackdropArtifacts();
+
     this.edgeGlow = this.scene.add.graphics().setDepth(-313);
     this.edgeGlow.fillStyle(0x5ecfff, 0.012);
     this.edgeGlow.fillEllipse(136, 342, 220, 560);
@@ -145,7 +97,7 @@ export class ParallaxField {
     this.edgeGlow.fillEllipse(540, 1810, 660, 180);
 
     this.createStars();
-    this.createDriftObjects();
+    this.createMoonSatellite();
 
     this.bottomGlow = this.scene.add
       .ellipse(WORLD_WIDTH * 0.5, WORLD_HEIGHT - 184, 780, 160, 0x5cffd4, 0.045)
@@ -178,206 +130,50 @@ export class ParallaxField {
     }
   }
 
-  private createDriftObjects(): void {
-    const objects: Array<{
-      key: string;
-      x: number;
-      y: number;
-      scale: number;
-      alpha: number;
-      depth: number;
-      tint?: number;
-      flipX?: boolean;
-      flipY?: boolean;
-      swayX: number;
-      swayY: number;
-      speed: number;
-      driftX: number;
-      driftY: number;
-      rotationRange: number;
-    }> = [
-      {
-        key: "station-spire",
-        x: 958,
-        y: 636,
-        scale: 0.15,
-        alpha: 0.06,
-        depth: -289,
-        tint: 0xc2d7e8,
-        flipX: true,
-        swayX: 4,
-        swayY: 6,
-        speed: 0.08,
-        driftX: -0.22,
-        driftY: 0.06,
-        rotationRange: 0.008
-      },
-      {
-        key: "comet-tail",
-        x: 194,
-        y: 362,
-        scale: 0.26,
-        alpha: 0.05,
-        depth: -288,
-        tint: 0xb6ddea,
-        swayX: 3,
-        swayY: 6,
-        speed: 0.08,
-        driftX: 0.2,
-        driftY: 0.04,
-        rotationRange: 0.008
-      }
-    ];
-
-    objects.forEach((config) => {
-      const sprite = this.scene.add
-        .image(config.x, config.y, config.key)
-        .setDepth(config.depth)
-        .setAlpha(config.alpha)
-        .setScale(config.scale);
-      sprite.setBlendMode(Phaser.BlendModes.SCREEN);
-      if (config.tint) {
-        sprite.setTint(config.tint);
-      }
-      if (config.flipX) {
-        sprite.setFlipX(true);
-      }
-      if (config.flipY) {
-        sprite.setFlipY(true);
-      }
-
-      this.driftObjects.push({
-        sprite,
-        baseX: config.x,
-        baseY: config.y,
-        phase: Math.random() * Math.PI * 2,
-        swayX: config.swayX,
-        swayY: config.swayY,
-        speed: config.speed,
-        driftX: config.driftX,
-        driftY: config.driftY,
-        rotationRange: config.rotationRange,
-        baseScale: config.scale
-      });
-    });
+  private createMoonSatellite(): void {
+    this.moonSatellite = this.scene.add
+      .image(WORLD_WIDTH * 0.5, WORLD_HEIGHT - 610, "moon-satellite")
+      .setDepth(-292)
+      .setDisplaySize(30, 30)
+      .setAlpha(1);
   }
 
-  private updatePixelComets(
-    elapsedMs: number,
-    swayX: number,
-    swayY: number
-  ): void {
-    if (elapsedMs >= this.nextCometSpawnAtMs) {
-      this.spawnPixelComet(elapsedMs);
-      this.nextCometSpawnAtMs = elapsedMs + Phaser.Math.Between(9_000, 15_000);
-    }
-
-    this.activeComets = this.activeComets.filter((comet, index) => {
-      const ageMs = elapsedMs - comet.spawnAtMs;
-
-      if (ageMs >= comet.lifetimeMs) {
-        comet.container.destroy();
-        return false;
-      }
-
-      const ageSeconds = ageMs / 1000;
-      const progress = ageMs / comet.lifetimeMs;
-      const driftX = comet.startX + comet.velocityX * ageSeconds + swayX * 0.16;
-      const driftY = comet.startY + comet.velocityY * ageSeconds + swayY * 0.08;
-      const shimmer =
-        0.72 + Math.max(0, Math.sin(ageSeconds * 8 + index)) * 0.24;
-
-      comet.container.setPosition(driftX, driftY);
-      comet.container.setAlpha(
-        Math.max(0, Math.min(1, (1 - progress) * 0.92 + 0.08))
-      );
-
-      comet.head.setAlpha(shimmer);
-      comet.spark.setAlpha(0.44 + shimmer * 0.42);
-      comet.trail.forEach((segment, segmentIndex) => {
-        segment.setAlpha(
-          Math.max(0.08, shimmer * (0.42 - segmentIndex * 0.07))
-        );
-      });
-
-      return true;
+  private updateMoonSatellite(elapsedMs: number): void {
+    const pointer = this.scene.input.activePointer;
+    const pointerX =
+      typeof pointer?.x === "number" && this.scene.scale.width > 0
+        ? Phaser.Math.Clamp(pointer.x / this.scene.scale.width - 0.5, -0.5, 0.5)
+        : 0;
+    const pointerY =
+      typeof pointer?.y === "number" && this.scene.scale.height > 0
+        ? Phaser.Math.Clamp(
+            pointer.y / this.scene.scale.height - 0.5,
+            -0.5,
+            0.5
+          )
+        : 0;
+    const position = calculateOrbitalSatellitePosition({
+      elapsedMs,
+      centerX: WORLD_WIDTH * 0.5,
+      centerY: WORLD_HEIGHT - 710,
+      radiusX: 620,
+      radiusY: 240,
+      pointerParallaxX: pointerX * 10,
+      pointerParallaxY: pointerY * 8
     });
+
+    this.moonSatellite.setPosition(position.x, position.y);
+    this.moonSatellite.setDisplaySize(30 * position.scale, 30 * position.scale);
+    this.moonSatellite.setAlpha(position.alpha);
   }
 
-  private spawnPixelComet(elapsedMs: number): void {
-    const routes = [
-      {
-        startX: -120,
-        startY: Phaser.Math.Between(180, 660),
-        velocityX: Phaser.Math.Between(210, 280),
-        velocityY: Phaser.Math.Between(36, 72)
-      },
-      {
-        startX: WORLD_WIDTH + 120,
-        startY: Phaser.Math.Between(220, 720),
-        velocityX: -Phaser.Math.Between(210, 280),
-        velocityY: Phaser.Math.Between(24, 68)
-      },
-      {
-        startX: Phaser.Math.Between(140, 940),
-        startY: -120,
-        velocityX: Phaser.Math.Between(-120, 120),
-        velocityY: Phaser.Math.Between(220, 290)
-      },
-      {
-        startX: Phaser.Math.Between(180, 900),
-        startY: Phaser.Math.Between(240, 560),
-        velocityX: Phaser.Math.Between(-230, -180),
-        velocityY: Phaser.Math.Between(90, 150)
-      }
-    ];
-
-    const route = Phaser.Utils.Array.GetRandom(routes);
-    const container = this.scene.add
-      .container(route.startX, route.startY)
-      .setDepth(46)
-      .setRotation(Math.atan2(route.velocityY, route.velocityX));
-
-    const trail = [0, 1, 2, 3].map((segmentIndex) =>
-      this.scene.add
-        .rectangle(
-          -18 - segmentIndex * 12,
-          0,
-          10 - segmentIndex,
-          segmentIndex === 0 ? 5 : 4,
-          segmentIndex < 2 ? 0x8cecff : 0x5cb4ff,
-          0.26 - segmentIndex * 0.04
-        )
-        .setOrigin(0.5)
-    );
-
-    const head = this.scene.add
-      .rectangle(0, 0, 8, 8, 0xfbf4c7, 0.94)
-      .setOrigin(0.5);
-    head.setStrokeStyle(1, 0x8cecff, 0.9);
-
-    const spark = this.scene.add
-      .rectangle(-7, 0, 6, 6, 0x9af3ff, 0.56)
-      .setOrigin(0.5);
-
-    container.add([...trail, spark, head]);
-    container.setBlendMode(Phaser.BlendModes.SCREEN);
-
-    const cometDistance = Math.max(WORLD_WIDTH, WORLD_HEIGHT) + 280;
-    const velocityMagnitude = Math.hypot(route.velocityX, route.velocityY);
-    const lifetimeMs = (cometDistance / velocityMagnitude) * 1000;
-
-    this.activeComets.push({
-      container,
-      head,
-      spark,
-      trail,
-      startX: route.startX,
-      startY: route.startY,
-      velocityX: route.velocityX,
-      velocityY: route.velocityY,
-      spawnAtMs: elapsedMs,
-      lifetimeMs
-    });
+  private coverBackdropArtifacts(): void {
+    const cleanup = this.scene.add.graphics().setDepth(-312);
+    cleanup.fillStyle(0x02050a, 0.82);
+    cleanup.fillEllipse(148, 405, 132, 340);
+    cleanup.fillStyle(0x03060c, 0.9);
+    cleanup.fillEllipse(798, 1160, 150, 110);
+    cleanup.fillStyle(0x04080f, 0.68);
+    cleanup.fillEllipse(824, 1170, 230, 170);
   }
 }
