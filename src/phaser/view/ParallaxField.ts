@@ -25,6 +25,19 @@ interface DriftObject {
   baseScale: number;
 }
 
+interface PixelComet {
+  container: Phaser.GameObjects.Container;
+  head: Phaser.GameObjects.Rectangle;
+  spark: Phaser.GameObjects.Rectangle;
+  trail: Phaser.GameObjects.Rectangle[];
+  startX: number;
+  startY: number;
+  velocityX: number;
+  velocityY: number;
+  spawnAtMs: number;
+  lifetimeMs: number;
+}
+
 export class ParallaxField {
   private backdrop!: Phaser.GameObjects.Image;
 
@@ -34,7 +47,11 @@ export class ParallaxField {
 
   private driftObjects: DriftObject[] = [];
 
+  private activeComets: PixelComet[] = [];
+
   private bottomGlow!: Phaser.GameObjects.Ellipse;
+
+  private nextCometSpawnAtMs = 7000;
 
   constructor(private scene: Phaser.Scene) {
     this.createBackdrop();
@@ -87,6 +104,8 @@ export class ParallaxField {
     this.bottomGlow.setAlpha(
       0.08 + Math.max(0, Math.sin(elapsed * 0.3)) * 0.04
     );
+
+    this.updatePixelComets(state.elapsedMs, swayX, swayY);
   }
 
   private createBackdrop(): void {
@@ -240,6 +259,125 @@ export class ParallaxField {
         rotationRange: config.rotationRange,
         baseScale: config.scale
       });
+    });
+  }
+
+  private updatePixelComets(
+    elapsedMs: number,
+    swayX: number,
+    swayY: number
+  ): void {
+    if (elapsedMs >= this.nextCometSpawnAtMs) {
+      this.spawnPixelComet(elapsedMs);
+      this.nextCometSpawnAtMs = elapsedMs + Phaser.Math.Between(9_000, 15_000);
+    }
+
+    this.activeComets = this.activeComets.filter((comet, index) => {
+      const ageMs = elapsedMs - comet.spawnAtMs;
+
+      if (ageMs >= comet.lifetimeMs) {
+        comet.container.destroy();
+        return false;
+      }
+
+      const ageSeconds = ageMs / 1000;
+      const progress = ageMs / comet.lifetimeMs;
+      const driftX = comet.startX + comet.velocityX * ageSeconds + swayX * 0.16;
+      const driftY = comet.startY + comet.velocityY * ageSeconds + swayY * 0.08;
+      const shimmer =
+        0.72 + Math.max(0, Math.sin(ageSeconds * 8 + index)) * 0.24;
+
+      comet.container.setPosition(driftX, driftY);
+      comet.container.setAlpha(
+        Math.max(0, Math.min(1, (1 - progress) * 0.92 + 0.08))
+      );
+
+      comet.head.setAlpha(shimmer);
+      comet.spark.setAlpha(0.44 + shimmer * 0.42);
+      comet.trail.forEach((segment, segmentIndex) => {
+        segment.setAlpha(
+          Math.max(0.08, shimmer * (0.42 - segmentIndex * 0.07))
+        );
+      });
+
+      return true;
+    });
+  }
+
+  private spawnPixelComet(elapsedMs: number): void {
+    const routes = [
+      {
+        startX: -120,
+        startY: Phaser.Math.Between(180, 660),
+        velocityX: Phaser.Math.Between(210, 280),
+        velocityY: Phaser.Math.Between(36, 72)
+      },
+      {
+        startX: WORLD_WIDTH + 120,
+        startY: Phaser.Math.Between(220, 720),
+        velocityX: -Phaser.Math.Between(210, 280),
+        velocityY: Phaser.Math.Between(24, 68)
+      },
+      {
+        startX: Phaser.Math.Between(140, 940),
+        startY: -120,
+        velocityX: Phaser.Math.Between(-120, 120),
+        velocityY: Phaser.Math.Between(220, 290)
+      },
+      {
+        startX: Phaser.Math.Between(180, 900),
+        startY: Phaser.Math.Between(240, 560),
+        velocityX: Phaser.Math.Between(-230, -180),
+        velocityY: Phaser.Math.Between(90, 150)
+      }
+    ];
+
+    const route = Phaser.Utils.Array.GetRandom(routes);
+    const container = this.scene.add
+      .container(route.startX, route.startY)
+      .setDepth(46)
+      .setRotation(Math.atan2(route.velocityY, route.velocityX));
+
+    const trail = [0, 1, 2, 3].map((segmentIndex) =>
+      this.scene.add
+        .rectangle(
+          -18 - segmentIndex * 12,
+          0,
+          10 - segmentIndex,
+          segmentIndex === 0 ? 5 : 4,
+          segmentIndex < 2 ? 0x8cecff : 0x5cb4ff,
+          0.26 - segmentIndex * 0.04
+        )
+        .setOrigin(0.5)
+    );
+
+    const head = this.scene.add
+      .rectangle(0, 0, 8, 8, 0xfbf4c7, 0.94)
+      .setOrigin(0.5);
+    head.setStrokeStyle(1, 0x8cecff, 0.9);
+
+    const spark = this.scene.add
+      .rectangle(-7, 0, 6, 6, 0x9af3ff, 0.56)
+      .setOrigin(0.5);
+
+    container.add([...trail, spark, head]);
+    container.setBlendMode(Phaser.BlendModes.SCREEN);
+
+    const cometDistance = Math.max(WORLD_WIDTH, WORLD_HEIGHT) + 280;
+    const velocityMagnitude = Math.hypot(route.velocityX, route.velocityY);
+    const lifetimeMs = (cometDistance / velocityMagnitude) * 1000;
+
+    this.activeComets.push({
+      container,
+      head,
+      spark,
+      trail,
+      startX: route.startX,
+      startY: route.startY,
+      velocityX: route.velocityX,
+      velocityY: route.velocityY,
+      spawnAtMs: elapsedMs,
+      lifetimeMs
     });
   }
 }
