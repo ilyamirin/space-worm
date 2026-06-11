@@ -51,18 +51,12 @@ export class GameplayScene extends Phaser.Scene {
     this.parallax = new ParallaxField(this);
     this.wormView = new WormView(this);
 
-    this.input.on(
-      "gameobjectdown",
-      (
-        _pointer: Phaser.Input.Pointer,
-        gameObject: Phaser.GameObjects.GameObject
-      ) => {
-        const shipId = gameObject.getData("shipId") as string | undefined;
-        if (shipId) {
-          this.bridge.dispatch("tapShip", { shipId });
-        }
-      }
-    );
+    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      this.bridge.dispatch("tapShip", {
+        x: pointer.worldX,
+        y: pointer.worldY
+      });
+    });
 
     this.music = this.sound.add("music-loop", {
       loop: true,
@@ -122,8 +116,6 @@ export class GameplayScene extends Phaser.Scene {
         const sprite = this.add
           .image(ship.x, ship.y, archetype.spriteKey)
           .setDepth(52);
-        sprite.setInteractive({ pixelPerfect: false, useHandCursor: true });
-        sprite.setData("shipId", ship.id);
 
         visual = { sprite, glow, trail };
         this.shipVisuals.set(ship.id, visual);

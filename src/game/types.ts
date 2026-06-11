@@ -7,6 +7,12 @@ export type GamePhase =
 
 export type InputAction = "tapShip" | "startRun" | "restartRun";
 
+export interface TapStrikePayload {
+  shipId?: string;
+  x?: number;
+  y?: number;
+}
+
 export type ShipStatus = "flying" | "targeted" | "escaped";
 
 export type WormAttackPhase =
@@ -95,6 +101,6 @@ export interface AssetManifest {
 export interface SceneBridge {
   getState: () => Readonly<GameState>;
   tick: (deltaMs: number) => void;
-  dispatch: (action: InputAction, payload?: { shipId?: string }) => void;
+  dispatch: (action: InputAction, payload?: TapStrikePayload) => void;
   subscribe: (listener: (state: Readonly<GameState>) => void) => () => void;
 }

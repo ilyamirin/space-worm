@@ -4,7 +4,8 @@ import type {
   GameState,
   InputAction,
   ShipArchetype,
-  ShipInstance
+  ShipInstance,
+  TapStrikePayload
 } from "../types";
 import {
   DIFFICULTY_STEP_MS,
@@ -44,7 +45,7 @@ export class GameSimulation {
     return this.state;
   }
 
-  dispatch(action: InputAction, payload?: { shipId?: string }): void {
+  dispatch(action: InputAction, payload?: TapStrikePayload): void {
     switch (action) {
       case "startRun":
         if (this.state.phase === "ready") {
@@ -66,8 +67,8 @@ export class GameSimulation {
         this.emit();
         break;
       case "tapShip":
-        if (payload?.shipId) {
-          this.handleShipTap(payload.shipId);
+        if (typeof payload?.x === "number" && typeof payload?.y === "number") {
+          this.handleStrikeTap(payload.x, payload.y);
         }
         break;
       default:
@@ -222,7 +223,6 @@ export class GameSimulation {
           worm.cooldownMs = POST_HIT_COOLDOWN_MS;
           worm.didHit = false;
         } else {
-          this.releaseTargetedShip();
           this.state.satiation = Math.max(
             0,
             this.state.satiation - MISS_PENALTY
@@ -235,7 +235,7 @@ export class GameSimulation {
     }
   }
 
-  private handleShipTap(shipId: string): void {
+  private handleStrikeTap(targetX: number, targetY: number): void {
     if (this.state.phase !== "running") {
       return;
     }
@@ -245,36 +245,29 @@ export class GameSimulation {
       return;
     }
 
-    const ship = this.state.activeShips.find(
-      (candidate) => candidate.id === shipId
-    );
-
-    if (!ship) {
-      return;
-    }
-
-    const dx = ship.x - worm.anchorX;
-    const dy = ship.y - worm.anchorY;
+    const dx = targetX - worm.anchorX;
+    const dy = targetY - worm.anchorY;
     const distance = Math.hypot(dx, dy);
 
-    if (distance > worm.maxReachPx) {
+    if (distance < 8) {
       return;
     }
 
+    const heading = Math.atan2(dy, dx);
+    const reach = Math.min(distance, worm.maxReachPx);
+    const clampedTargetX = worm.anchorX + Math.cos(heading) * reach;
+    const clampedTargetY = worm.anchorY + Math.sin(heading) * reach;
+
     worm.attackPhase = "extending";
-    worm.targetShipId = ship.id;
-    worm.targetX = ship.x;
-    worm.targetY = ship.y;
+    worm.targetShipId = null;
+    worm.targetX = clampedTargetX;
+    worm.targetY = clampedTargetY;
     worm.tipX = worm.anchorX;
     worm.tipY = worm.anchorY;
     worm.strikeElapsedMs = 0;
-    worm.strikeDurationMs = Phaser.Math.Clamp(distance * 0.48, 180, 360);
+    worm.strikeDurationMs = Phaser.Math.Clamp(reach * 0.48, 180, 360);
     worm.didHit = false;
     worm.hasContactThisStrike = false;
-
-    this.state.activeShips = this.state.activeShips.map((candidate) =>
-      candidate.id === ship.id ? { ...candidate, state: "targeted" } : candidate
-    );
   }
 
   private createShipInstance(): ShipInstance {
@@ -325,16 +318,6 @@ export class GameSimulation {
   }
 
   private tryCaptureTargetShip(worm: GameState["worm"]): boolean {
-    const ship = worm.targetShipId
-      ? this.state.activeShips.find(
-          (candidate) => candidate.id === worm.targetShipId
-        )
-      : undefined;
-
-    if (!ship) {
-      return false;
-    }
-
     const heading = Phaser.Math.Angle.Between(
       worm.anchorX,
       worm.anchorY,
@@ -344,20 +327,16 @@ export class GameSimulation {
     const jawX = worm.tipX + Math.cos(heading) * worm.jawForwardOffsetPx;
     const jawY = worm.tipY + Math.sin(heading) * worm.jawForwardOffsetPx;
 
-    const headContact = this.canHitShip(
-      ship,
+    const ship = this.pickCapturedShip(
       worm.tipX,
       worm.tipY,
-      worm.headContactRadiusPx
-    );
-    const jawContact = this.canHitShip(
-      ship,
+      worm.headContactRadiusPx,
       jawX,
       jawY,
       worm.jawCaptureRadiusPx
     );
 
-    if (!headContact && !jawContact) {
+    if (!ship) {
       return false;
     }
 
@@ -373,6 +352,7 @@ export class GameSimulation {
 
     worm.hasContactThisStrike = true;
     worm.didHit = true;
+    worm.targetShipId = ship.id;
     worm.attackPhase = "biting";
     worm.strikeElapsedMs = 0;
     worm.strikeDurationMs = HIT_BITE_HOLD_MS;
@@ -390,24 +370,42 @@ export class GameSimulation {
     worm.strikeDurationMs = Math.max(180, worm.strikeDurationMs);
   }
 
-  private releaseTargetedShip(): void {
-    this.state.activeShips = this.state.activeShips.map((candidate) =>
-      candidate.state === "targeted"
-        ? { ...candidate, state: "flying" }
-        : candidate
-    );
-  }
+  private pickCapturedShip(
+    headX: number,
+    headY: number,
+    headRadius: number,
+    jawX: number,
+    jawY: number,
+    jawRadius: number
+  ): ShipInstance | null {
+    let bestShip: ShipInstance | null = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
 
-  private canHitShip(
-    ship: ShipInstance,
-    x: number,
-    y: number,
-    extraRadius = 0
-  ): boolean {
-    const archetype = this.getArchetype(ship.archetypeId);
-    return (
-      Math.hypot(ship.x - x, ship.y - y) <= archetype.hitRadius + extraRadius
-    );
+    for (const ship of this.state.activeShips) {
+      const archetype = this.getArchetype(ship.archetypeId);
+      const headDistance = Math.hypot(ship.x - headX, ship.y - headY);
+      const jawDistance = Math.hypot(ship.x - jawX, ship.y - jawY);
+      const headReach = archetype.hitRadius + headRadius;
+      const jawReach = archetype.hitRadius + jawRadius;
+      const inHead = headDistance <= headReach;
+      const inJaw = jawDistance <= jawReach;
+
+      if (!inHead && !inJaw) {
+        continue;
+      }
+
+      const contactDistance = Math.min(
+        headDistance - headReach,
+        jawDistance - jawReach
+      );
+
+      if (contactDistance < bestDistance) {
+        bestDistance = contactDistance;
+        bestShip = ship;
+      }
+    }
+
+    return bestShip;
   }
 
   private emit(): void {
