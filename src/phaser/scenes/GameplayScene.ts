@@ -83,7 +83,7 @@ export class GameplayScene extends Phaser.Scene {
 
     this.music = this.sound.add("music-loop", {
       loop: true,
-      volume: 0.48
+      volume: 0.36
     });
 
     this.previousScore = this.bridge.getState().score;
