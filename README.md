@@ -1,56 +1,58 @@
 # Space Worm
 
-Space Worm is a fully AI-generated small cinematic arcade game about an enormous
-cosmic predator rising from a living planet to snap passing ships out of orbit.
+**Space Worm** is a fully AI-generated cinematic arcade game about an enormous
+cosmic predator rising from a living planet to devour ships crossing low orbit.
 
-You control the worm with one action: click or tap a ship. The worm lunges,
-bites, retracts, and must keep feeding before its satiety runs out. The game is
-built for quick dramatic runs: neon ships cut across a dark orbital sky,
-pixel comets streak through the background, and the planet waits below like a
-stage for the next strike.
+It is built around a single violent action: click or tap a ship, and the worm
+launches from the planet surface toward its prey. Hits restore satiety and keep
+the run alive. Misses cost precious hunger time. The result is a compact,
+dramatic score-chasing loop with neon ships, pixel comets, orbital motion,
+engine audio, and a planet-sized monster.
 
 ![Space Worm gameplay screenshot](docs/gameplay-screenshot.jpg)
 
-## What Makes It Interesting
+## Gameplay
 
-- One-button arcade loop: target ships, strike, recover, repeat.
-- A satiety meter that constantly drains and turns every miss into pressure.
-- Multiple ship archetypes with different silhouettes, values, speeds, and
-  movement patterns.
-- A layered Phaser scene with parallax space, an orbital moon, pixel comets,
-  ship trails, worm appendages, bite feedback, start/restart overlays, and audio
-  cues.
-- A compact TypeScript/Vite codebase that is easy to run locally and modify.
+Space Worm is intentionally simple to play and immediate to read:
 
-## How The Game Works
+- Ships fly through orbital lanes with different silhouettes, speeds, values,
+  and movement patterns.
+- The worm waits on the planet surface.
+- The player clicks or taps a ship to launch a strike.
+- A successful bite adds score and restores satiety.
+- A miss drains satiety and forces a short recovery.
+- The run ends when satiety reaches zero.
 
-The game runs as a Phaser scene backed by a small deterministic-ish simulation
-layer:
-
-1. The simulation spawns ships into flight lanes.
-2. Each ship follows its archetype movement pattern.
-3. The player clicks or taps a target.
-4. The worm extends toward the target and either captures it or misses.
-5. A hit adds score and restores satiety.
-6. A miss costs satiety and forces a short recovery.
-7. The run ends when satiety reaches zero.
-
-The UI is deliberately minimal: score, satiety, and the game world stay visible
-without menus interrupting the action.
+The challenge comes from timing and target choice. Faster ships are worth more,
+but a bad strike can end a run quickly.
 
 ## Controls
 
-- Start run: click/tap the start button after the intro.
-- Attack: click/tap a ship.
-- Restart: click/tap the restart button after game over.
+| Action      | Input                        |
+| ----------- | ---------------------------- |
+| Start run   | Click/tap the start button   |
+| Attack ship | Click/tap a ship             |
+| Restart run | Click/tap the restart button |
+
+## Features
+
+- One-button arcade combat loop.
+- Satiety pressure instead of a health bar.
+- Multiple ship archetypes with unique movement profiles.
+- Animated worm strike, bite, retract, and recovery phases.
+- Parallax space backdrop with an orbital moon and ambient pixel comets.
+- Ship trails, glow effects, bite feedback, and cinematic start/restart
+  overlays.
+- Spatial-style ship engine audio and bite/UI sound effects.
+- A small TypeScript simulation layer separated from Phaser rendering.
 
 ## Tech Stack
 
-- [Phaser 3](https://phaser.io/) for rendering, input, scenes, audio, and game
-  objects.
-- [TypeScript](https://www.typescriptlang.org/) for game state and view logic.
+- [Phaser 3](https://phaser.io/) for scenes, rendering, game objects, input,
+  and audio.
+- [TypeScript](https://www.typescriptlang.org/) for simulation and view logic.
 - [Vite](https://vite.dev/) for local development and production builds.
-- Plain DOM/CSS for the HUD and overlays.
+- Plain DOM and CSS for the HUD, intro, and restart overlay.
 
 ## Run Locally
 
@@ -71,7 +73,7 @@ Start the development server:
 pnpm dev
 ```
 
-Build a production bundle:
+Build the production bundle:
 
 ```bash
 pnpm build
@@ -83,40 +85,67 @@ Preview the production bundle:
 pnpm preview
 ```
 
-Run the project checks:
+Run project checks:
 
 ```bash
 pnpm verify
 ```
 
-Note: in local worktrees, `pnpm verify` can fail if unrelated generated build
-artifacts are present under ignored or auxiliary worktree folders. The game
-build itself is `pnpm build`.
+Note: in local development, `pnpm verify` can fail if unrelated generated build
+artifacts are present under auxiliary worktree folders. The production game
+build itself is verified with `pnpm build`.
+
+## Deployment
+
+The project is configured for GitHub Pages through GitHub Actions.
+
+- Pages URL: <https://ilyamirin.github.io/space-worm/>
+- Workflow: [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml)
+- Publishing source: GitHub Actions
+
+The workflow installs dependencies with pnpm, typechecks the project, builds the
+Vite static bundle with `GITHUB_PAGES=true`, uploads `dist/` as a Pages artifact,
+and deploys it with `actions/deploy-pages`.
 
 ## Project Structure
 
 ```text
-src/game/               Simulation, content definitions, asset manifest, types
-src/phaser/             Phaser scenes, view objects, scene bridge
+src/game/               Simulation state, content, assets, and shared types
+src/phaser/             Phaser scenes, rendering views, and scene bridge
 src/ui/                 DOM HUD and overlay creation
-src/styles.css          App frame, HUD, intro, and restart styling
+src/styles.css          App shell, HUD, intro, and restart styling
 public/assets/          Runtime image, audio, and data assets
 docs/                   Design notes and README screenshot
 ```
+
+## Architecture Notes
+
+The game is split into a small simulation core and Phaser-specific rendering:
+
+- `GameSimulation` owns score, satiety, ship spawning, strike state, hit/miss
+  handling, and difficulty progression.
+- `GameplayScene` bridges simulation state into Phaser objects.
+- View classes such as `WormView` and `ParallaxField` render the worm, ships,
+  background layers, comets, glow, and motion feedback.
+- The DOM HUD subscribes to the scene bridge and dispatches start/restart
+  actions.
+
+This keeps the game loop compact while still allowing the visuals to be layered
+and theatrical.
 
 ## AI Generation Disclosure
 
 This project is intentionally fully AI-generated, except for the credited CC0
 third-party audio assets.
 
-All original project work was produced with AI assistance, including the game
-concept, TypeScript implementation, CSS, generated visual art direction, SVG
-game objects, UI composition, documentation, and the gameplay screenshot. Human
-direction was used to steer the result, choose the style, request fixes, and
-approve changes.
+AI assistance was used for the game concept, implementation, TypeScript
+architecture, CSS, SVG game objects, generated visual art direction, UI
+composition, documentation, and gameplay screenshot capture. Human direction was
+used to guide the concept, request changes, choose the tone, approve assets, and
+shape the final result.
 
 Third-party audio assets are not claimed as AI-generated. They are credited
-below and are used under free licenses.
+below and remain under their original free licenses.
 
 ## Assets And Credits
 
