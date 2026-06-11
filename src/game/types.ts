@@ -15,6 +15,14 @@ export interface TapStrikePayload {
 
 export type ShipStatus = "flying" | "targeted" | "escaped";
 
+export type ShipMovementPattern =
+  | "sine"
+  | "arc"
+  | "sCurve"
+  | "dashStop"
+  | "wideSCurve"
+  | "zigzagBlink";
+
 export type WormAttackPhase =
   | "idle"
   | "extending"
@@ -34,6 +42,7 @@ export interface ShipArchetype {
   scoreValue: number;
   satiationValue: number;
   spawnWeight: number;
+  movementPattern: ShipMovementPattern;
 }
 
 export interface ShipInstance {
@@ -42,6 +51,13 @@ export interface ShipInstance {
   lane: number;
   x: number;
   y: number;
+  spawnX: number;
+  spawnY: number;
+  direction: 1 | -1;
+  speed: number;
+  ageMs: number;
+  movementPhase: number;
+  movementPattern: ShipMovementPattern;
   velocityX: number;
   state: ShipStatus;
 }

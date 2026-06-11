@@ -123,12 +123,14 @@ export class GameplayScene extends Phaser.Scene {
 
       const floatOffset =
         Math.sin(elapsedMs * 0.0016 + ship.id.length + ship.lane * 0.02) * 6;
-      const dir = ship.velocityX > 0 ? 1 : -1;
-      const shipRotation = ship.velocityX > 0 ? 0 : Math.PI;
+      const dir = ship.direction;
+      const shipRotation = ship.direction > 0 ? 0 : Math.PI;
       const scaleMultiplier = ship.state === "targeted" ? 1.1 : 1;
       const pulse = 0.72 + Math.sin(elapsedMs * 0.004 + ship.y * 0.01) * 0.12;
       const trailLength = 96 + Math.min(46, Math.abs(ship.velocityX) * 0.09);
       const verticalLean = Math.sin(elapsedMs * 0.002 + ship.x * 0.01) * 12;
+      const cueAlpha = this.getPatternCueAlpha(ship, elapsedMs);
+      const patternTrailWidth = this.getTrailWidth(ship);
 
       visual.sprite.setPosition(ship.x, ship.y + floatOffset);
       visual.sprite.setRotation(shipRotation);
@@ -148,12 +150,15 @@ export class GameplayScene extends Phaser.Scene {
       visual.glow.setDepth(ship.state === "targeted" ? 55 : 50);
       visual.glow.setFillStyle(
         archetype.glowColor,
-        ship.state === "targeted" ? 0.34 : 0.16 + pulse * 0.08
+        Math.max(
+          ship.state === "targeted" ? 0.34 : 0.16 + pulse * 0.08,
+          cueAlpha
+        )
       );
 
       visual.trail.clear();
       visual.trail.lineStyle(
-        ship.state === "targeted" ? 8 : 6,
+        ship.state === "targeted" ? patternTrailWidth + 2 : patternTrailWidth,
         archetype.trailColor,
         ship.state === "targeted" ? 0.28 : 0.16
       );
@@ -176,6 +181,37 @@ export class GameplayScene extends Phaser.Scene {
         ship.state === "targeted" ? 9 : 7
       );
     });
+  }
+
+  private getPatternCueAlpha(ship: ShipInstance, elapsedMs: number): number {
+    const ageSeconds = ship.ageMs / 1000;
+
+    if (ship.movementPattern === "dashStop") {
+      const cycleProgress = (ageSeconds + ship.movementPhase * 0.11) % 1.55;
+      return cycleProgress > 0.52 && cycleProgress < 0.72 ? 0.45 : 0;
+    }
+
+    if (ship.movementPattern === "zigzagBlink") {
+      const cycleProgress = (ageSeconds + ship.movementPhase * 0.07) % 1.35;
+      return cycleProgress > 0.62 && cycleProgress < 0.74
+        ? 0.5 + Math.sin(elapsedMs * 0.04) * 0.18
+        : 0;
+    }
+
+    return 0;
+  }
+
+  private getTrailWidth(ship: ShipInstance): number {
+    switch (ship.movementPattern) {
+      case "dashStop":
+        return ship.velocityX === 0 ? 4 : 8;
+      case "wideSCurve":
+        return 9;
+      case "zigzagBlink":
+        return 7;
+      default:
+        return 6;
+    }
   }
 
   private syncAudio(phase: string): void {

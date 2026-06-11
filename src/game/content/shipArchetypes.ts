@@ -10,9 +10,10 @@ export const SHIP_ARCHETYPES: ShipArchetype[] = [
     glowColor: 0x90d4ff,
     trailColor: 0x74c8ff,
     baseSpeed: 290,
-    scoreValue: 12,
+    scoreValue: 10,
     satiationValue: 14,
-    spawnWeight: 5
+    spawnWeight: 5,
+    movementPattern: "sine"
   },
   {
     id: "saucer",
@@ -25,7 +26,8 @@ export const SHIP_ARCHETYPES: ShipArchetype[] = [
     baseSpeed: 240,
     scoreValue: 14,
     satiationValue: 16,
-    spawnWeight: 4
+    spawnWeight: 4,
+    movementPattern: "arc"
   },
   {
     id: "arrow",
@@ -36,9 +38,10 @@ export const SHIP_ARCHETYPES: ShipArchetype[] = [
     glowColor: 0x8af7e0,
     trailColor: 0x59d6c4,
     baseSpeed: 360,
-    scoreValue: 18,
+    scoreValue: 21,
     satiationValue: 18,
-    spawnWeight: 3
+    spawnWeight: 3,
+    movementPattern: "dashStop"
   },
   {
     id: "ring",
@@ -49,9 +52,10 @@ export const SHIP_ARCHETYPES: ShipArchetype[] = [
     glowColor: 0xc0b7ff,
     trailColor: 0x9787ff,
     baseSpeed: 320,
-    scoreValue: 16,
+    scoreValue: 17,
     satiationValue: 17,
-    spawnWeight: 4
+    spawnWeight: 4,
+    movementPattern: "sCurve"
   },
   {
     id: "triwing",
@@ -62,9 +66,10 @@ export const SHIP_ARCHETYPES: ShipArchetype[] = [
     glowColor: 0xff94d2,
     trailColor: 0xff6db3,
     baseSpeed: 385,
-    scoreValue: 22,
+    scoreValue: 30,
     satiationValue: 21,
-    spawnWeight: 2
+    spawnWeight: 2,
+    movementPattern: "zigzagBlink"
   },
   {
     id: "blockade",
@@ -75,8 +80,9 @@ export const SHIP_ARCHETYPES: ShipArchetype[] = [
     glowColor: 0xaef0ff,
     trailColor: 0x86bfd7,
     baseSpeed: 260,
-    scoreValue: 20,
+    scoreValue: 23,
     satiationValue: 24,
-    spawnWeight: 2
+    spawnWeight: 2,
+    movementPattern: "wideSCurve"
   }
 ];

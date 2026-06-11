@@ -1,18 +1,31 @@
 <svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="triwingHull" x1="58" y1="44" x2="265" y2="138" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFF1FB"/>
-      <stop offset="0.5" stop-color="#FF9CD5"/>
-      <stop offset="1" stop-color="#664A6D"/>
+    <linearGradient id="triwingHull" x1="32" y1="29" x2="289" y2="144" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD7EE"/>
+      <stop offset="0.42" stop-color="#FF94D2"/>
+      <stop offset="1" stop-color="#7B336C"/>
+    </linearGradient>
+    <linearGradient id="triwingGhost" x1="53" y1="46" x2="311" y2="137" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C0B7FF" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#8AF7E0" stop-opacity="0.75"/>
     </linearGradient>
   </defs>
-  <path d="M68 93L149 54L198 54L270 90L198 126H149L68 93Z" fill="url(#triwingHull)"/>
-  <path d="M104 88L72 43L136 72" fill="#FFC4E7"/>
-  <path d="M104 98L72 138L136 113" fill="#7B4E6B"/>
-  <path d="M180 54L223 30L209 78" fill="#FFD8EE"/>
-  <path d="M180 126L223 150L209 102" fill="#7A506E"/>
-  <ellipse cx="171" cy="90" rx="20" ry="11" fill="#4A2D4A"/>
-  <ellipse cx="171" cy="90" rx="11" ry="6" fill="#FFE6F4"/>
-  <path d="M208 90H298" stroke="#FFB9E2" stroke-width="8" stroke-linecap="round"/>
-  <path d="M296 90L315 80V100L296 90Z" fill="#FF8DD2"/>
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;0.55;0" keyTimes="0;0.72;0.82;1" dur="1.35s" repeatCount="indefinite"/>
+    <path d="M63 78L171 18L279 83L222 154L111 145Z" fill="url(#triwingGhost)" transform="translate(18 -8)"/>
+  </g>
+  <path d="M54 83L168 24L272 87L212 150L105 140Z" fill="url(#triwingHull)"/>
+  <path d="M116 68L184 47L226 88L180 115Z" fill="#301B35"/>
+  <path d="M55 83L7 55L33 96L9 132L68 113" fill="#FFF4D8"/>
+  <path d="M213 82L314 42L276 90L314 139L211 113" fill="#C0B7FF"/>
+  <path d="M143 32L171 6L190 49" fill="#FF6DB3"/>
+  <g>
+    <animate attributeName="opacity" values="0.25;0.25;0.9;0.25" keyTimes="0;0.55;0.74;1" dur="1.35s" repeatCount="indefinite"/>
+    <path d="M85 69L248 126" stroke="#8AF7E0" stroke-width="7" stroke-linecap="round"/>
+    <path d="M89 119L246 62" stroke="#8AF7E0" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <circle cx="130" cy="118" r="10" fill="#8AF7E0"/>
+  <circle cx="225" cy="86" r="10" fill="#8AF7E0"/>
+  <circle cx="177" cy="88" r="12" fill="#FFF4D8"/>
+  <path d="M272 85L320 70L320 110L272 99" fill="#FF6DB3" opacity="0.72"/>
 </svg>
