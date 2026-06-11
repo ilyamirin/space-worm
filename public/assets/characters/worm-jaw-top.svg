@@ -1,15 +1,47 @@
-<svg width="280" height="170" viewBox="0 0 280 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg
+  width="280"
+  height="170"
+  viewBox="0 0 280 170"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
   <defs>
-    <linearGradient id="jawTopShell" x1="26" y1="84" x2="260" y2="52" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#422312"/>
-      <stop offset="0.32" stop-color="#6F4023"/>
-      <stop offset="0.72" stop-color="#EED4BB"/>
-      <stop offset="1" stop-color="#FFF5E6"/>
+    <linearGradient
+      id="jawTopShell"
+      x1="26"
+      y1="84"
+      x2="260"
+      y2="52"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#422312" />
+      <stop offset="0.32" stop-color="#6F4023" />
+      <stop offset="0.72" stop-color="#EED4BB" />
+      <stop offset="1" stop-color="#FFF5E6" />
     </linearGradient>
   </defs>
-  <path d="M18 110C42 90 76 74 119 64C154 56 194 48 250 36C258 34 263 41 259 48C238 83 212 109 178 126C145 143 104 147 55 136L18 110Z" fill="url(#jawTopShell)"/>
-  <path d="M56 99C97 88 143 78 218 59" stroke="#FFF5E2" stroke-width="7" stroke-linecap="round" stroke-opacity="0.78"/>
-  <path d="M40 117C93 133 138 133 176 120" stroke="#3F2010" stroke-width="6" stroke-linecap="round" stroke-opacity="0.72"/>
-  <path d="M232 51C246 45 256 41 263 39" stroke="#2E160C" stroke-width="6" stroke-linecap="round"/>
-  <path d="M212 94L247 120" stroke="#E8DDCA" stroke-width="8" stroke-linecap="round"/>
+  <path
+    d="M18 110C42 90 76 74 119 64C154 56 194 48 250 36C258 34 263 41 259 48C238 83 212 109 178 126C145 143 104 147 55 136L18 110Z"
+    fill="url(#jawTopShell)"
+  />
+  <path
+    d="M56 99C97 88 143 78 218 59"
+    stroke="#FFF5E2"
+    stroke-width="7"
+    stroke-linecap="round"
+    stroke-opacity="0.78"
+  />
+  <path
+    d="M40 117C93 133 138 133 176 120"
+    stroke="#3F2010"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-opacity="0.72"
+  />
+  <path
+    d="M232 51C246 45 256 41 263 39"
+    stroke="#2E160C"
+    stroke-width="6"
+    stroke-linecap="round"
+  />
 </svg>

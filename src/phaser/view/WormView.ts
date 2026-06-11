@@ -234,26 +234,42 @@ export class WormView {
       tipY: worm.tipY
     });
     const biting = worm.attackPhase === "biting";
+    const lanternTucked =
+      worm.attackPhase === "extending" ||
+      worm.attackPhase === "biting" ||
+      worm.attackPhase === "retracting";
 
     this.appendageLines.clear();
 
-    this.appendageLines.lineStyle(8.2, 0xd7a66f, 0.82);
-    this.drawCurve(this.appendageLines, pose.lantern);
-    pose.whiskers.forEach((whisker, index) => {
-      this.appendageLines.lineStyle(
-        3.8 - (index % 3) * 0.25,
-        index < 3 ? 0xc69a68 : 0x8fa06e,
-        0.72
-      );
-      this.drawCurve(this.appendageLines, whisker);
-    });
+    if (!lanternTucked) {
+      this.appendageLines.lineStyle(8.2, 0xd7a66f, 0.82);
+      this.drawCurve(this.appendageLines, pose.lantern);
+      pose.whiskers.forEach((whisker, index) => {
+        this.appendageLines.lineStyle(
+          3.8 - (index % 3) * 0.25,
+          index < 3 ? 0xc69a68 : 0x8fa06e,
+          0.72
+        );
+        this.drawCurve(this.appendageLines, whisker);
+      });
+    }
 
     this.lanternHalo.setPosition(pose.lantern.end.x, pose.lantern.end.y);
     this.lanternHalo.setScale(biting ? 1.38 : 1.12, biting ? 1.38 : 1.12);
-    this.lanternHalo.setFillStyle(0xfff1c7, pose.lantern.glowAlpha * 0.22);
+    this.lanternHalo.setDepth(lanternTucked ? 102.7 : 107);
+    this.lanternHalo.setFillStyle(
+      0xfff1c7,
+      pose.lantern.glowAlpha * (lanternTucked ? 0.08 : 0.22)
+    );
     this.lanternCore.setPosition(pose.lantern.end.x, pose.lantern.end.y);
-    this.lanternCore.setScale(biting ? 1.18 : 1.02);
-    this.lanternCore.setFillStyle(0xfff7dc, biting ? 0.96 : 0.9);
+    this.lanternCore.setDepth(lanternTucked ? 102.8 : 108);
+    this.lanternCore.setScale(
+      lanternTucked ? (biting ? 0.56 : 0.72) : biting ? 1.18 : 1.02
+    );
+    this.lanternCore.setFillStyle(
+      0xfff7dc,
+      lanternTucked ? 0.42 : biting ? 0.96 : 0.9
+    );
   }
 
   private drawCurve(

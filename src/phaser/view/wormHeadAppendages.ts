@@ -84,13 +84,23 @@ export function getWormHeadAppendagePose({
       : mixDirection(targetAim, planetDirection, throwLag * 0.18);
   const sideSign =
     forward.x * targetDirection.y - forward.y * targetDirection.x >= 0 ? 1 : -1;
-  const extending = attackPhase === "extending";
   const biting = attackPhase === "biting";
   const sway = Math.sin(elapsedMs * 0.0032) * 7;
   const glowBase = biting ? 0.74 : 0.28 + reach * 0.22;
   const tip = { x: tipX, y: tipY };
 
-  const lanternLength = 232 + reach * 72 + (extending ? 36 : 0);
+  const lanternLength = 464 + reach * 96;
+  const retraction =
+    attackPhase === "idle"
+      ? 1
+      : attackPhase === "recovering"
+        ? 0.78
+        : attackPhase === "retracting"
+          ? 0.32
+          : biting
+            ? 0.1
+            : 0.24 + (1 - throwLag) * 0.06;
+  const visibleLanternLength = lanternLength * retraction;
   const lanternRoot = {
     x: tipX - forward.x * 62 + side.x * sideSign * 18,
     y: tipY - forward.y * 62 + side.y * sideSign * 18
@@ -98,26 +108,33 @@ export function getWormHeadAppendagePose({
   const lanternEnd = {
     x:
       lanternRoot.x +
-      aim.x * lanternLength +
-      side.x * sideSign * (18 + sway * 0.7) -
-      headVelocityX * throwLag * 0.018,
+      aim.x * visibleLanternLength +
+      side.x *
+        sideSign *
+        (attackPhase === "idle" ? 64 + sway : 28 + sway * 0.7) -
+      headVelocityX * throwLag * 0.014,
     y:
       lanternRoot.y +
-      aim.y * lanternLength +
-      side.y * sideSign * (18 + sway * 0.7) -
-      headVelocityY * throwLag * 0.018
+      aim.y * visibleLanternLength +
+      side.y *
+        sideSign *
+        (attackPhase === "idle" ? 64 + sway : 28 + sway * 0.7) -
+      headVelocityY * throwLag * 0.014
   };
+  const foldTowardBody =
+    attackPhase === "idle" ? 0 : (0.55 + throwLag * 0.45) * 220;
+  const bendWidth = attackPhase === "idle" ? 280 : biting ? 76 : 104;
   const lanternControl = {
     x:
       lanternRoot.x +
-      aim.x * (lanternLength * 0.4) +
-      planetDirection.x * throwLag * 168 +
-      side.x * sideSign * (66 + sway),
+      aim.x * (visibleLanternLength * 0.34) +
+      planetDirection.x * foldTowardBody +
+      side.x * sideSign * (bendWidth + sway),
     y:
       lanternRoot.y +
-      aim.y * (lanternLength * 0.4) +
-      planetDirection.y * throwLag * 168 +
-      side.y * sideSign * (66 + sway)
+      aim.y * (visibleLanternLength * 0.34) +
+      planetDirection.y * foldTowardBody +
+      side.y * sideSign * (bendWidth + sway)
   };
 
   const whiskers = [-1, -1, -1, 1, 1, 1].map((whiskerSide, index) => {
