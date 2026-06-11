@@ -21,6 +21,7 @@ import {
   WORLD_WIDTH
 } from "./config";
 import { createInitialState, createInitialWormState } from "./createState";
+import { calculateShipPosition } from "./shipMovement";
 
 const MAX_SHIPS_BY_TIER = [2, 3, 3, 4, 5];
 
@@ -105,17 +106,22 @@ export class GameSimulation {
   }
 
   private updateShips(deltaMs: number): void {
-    const travelSeconds = deltaMs / 1000;
-
     this.state.activeShips = this.state.activeShips
-      .map((ship) => ({
-        ...ship,
-        x: ship.x + ship.velocityX * travelSeconds
-      }))
+      .map((ship) => {
+        const agedShip = {
+          ...ship,
+          ageMs: ship.ageMs + deltaMs
+        };
+
+        return {
+          ...agedShip,
+          ...calculateShipPosition(agedShip)
+        };
+      })
       .filter((ship) => {
-        const escapedLeft = ship.velocityX < 0 && ship.x < -SPAWN_PADDING;
+        const escapedLeft = ship.direction < 0 && ship.x < -SPAWN_PADDING;
         const escapedRight =
-          ship.velocityX > 0 && ship.x > WORLD_WIDTH + SPAWN_PADDING;
+          ship.direction > 0 && ship.x > WORLD_WIDTH + SPAWN_PADDING;
         return !(escapedLeft || escapedRight);
       });
   }
@@ -276,19 +282,33 @@ export class GameSimulation {
     const direction = Math.random() > 0.5 ? 1 : -1;
     const speedBoost = this.state.difficultyTier * 18;
     const speed = archetype.baseSpeed + speedBoost + Math.random() * 32;
-    const x = direction > 0 ? -SPAWN_PADDING : WORLD_WIDTH + SPAWN_PADDING;
-    const velocityX = speed * direction;
+    const spawnX = direction > 0 ? -SPAWN_PADDING : WORLD_WIDTH + SPAWN_PADDING;
+    const spawnY =
+      lane + Phaser.Math.Between(-SHIP_LANE_JITTER, SHIP_LANE_JITTER);
+    const movementPhase = Math.random() * Math.PI * 2;
 
     this.shipId += 1;
 
-    return {
+    const ship: ShipInstance = {
       id: `ship-${this.shipId}`,
       archetypeId: archetype.id,
       lane,
-      x,
-      y: lane + Phaser.Math.Between(-SHIP_LANE_JITTER, SHIP_LANE_JITTER),
-      velocityX,
+      x: spawnX,
+      y: spawnY,
+      spawnX,
+      spawnY,
+      direction,
+      speed,
+      ageMs: 0,
+      movementPhase,
+      movementPattern: archetype.movementPattern,
+      velocityX: speed * direction,
       state: "flying"
+    };
+
+    return {
+      ...ship,
+      ...calculateShipPosition(ship)
     };
   }
 
