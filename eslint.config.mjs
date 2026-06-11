@@ -9,6 +9,7 @@ export default [
       "dist/**",
       "node_modules/**",
       ".playwright-cli/**",
+      ".worktrees/**",
       "coverage/**",
       "*.tsbuildinfo",
       "vite.config.js",
