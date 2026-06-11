@@ -90,48 +90,54 @@ export function getWormHeadAppendagePose({
   const glowBase = biting ? 0.74 : 0.28 + reach * 0.22;
   const tip = { x: tipX, y: tipY };
 
-  const lanternLength = 220 + reach * 68 + (extending ? 30 : 0);
+  const lanternLength = 232 + reach * 72 + (extending ? 36 : 0);
   const lanternRoot = {
-    x: tipX - forward.x * 44 + side.x * sideSign * 32,
-    y: tipY - forward.y * 44 + side.y * sideSign * 32
+    x: tipX - forward.x * 62 + side.x * sideSign * 18,
+    y: tipY - forward.y * 62 + side.y * sideSign * 18
   };
   const lanternEnd = {
-    x: lanternRoot.x + aim.x * lanternLength + side.x * sideSign * (10 + sway),
-    y: lanternRoot.y + aim.y * lanternLength + side.y * sideSign * (10 + sway)
+    x:
+      lanternRoot.x +
+      aim.x * lanternLength +
+      side.x * sideSign * (18 + sway * 0.7) -
+      headVelocityX * throwLag * 0.018,
+    y:
+      lanternRoot.y +
+      aim.y * lanternLength +
+      side.y * sideSign * (18 + sway * 0.7) -
+      headVelocityY * throwLag * 0.018
   };
   const lanternControl = {
     x:
       lanternRoot.x +
-      aim.x * (lanternLength * 0.46) +
-      planetDirection.x * throwLag * 120 +
-      side.x * sideSign * (54 + sway * 0.6),
+      aim.x * (lanternLength * 0.4) +
+      planetDirection.x * throwLag * 168 +
+      side.x * sideSign * (66 + sway),
     y:
       lanternRoot.y +
-      aim.y * (lanternLength * 0.46) +
-      planetDirection.y * throwLag * 120 +
-      side.y * sideSign * (54 + sway * 0.6)
+      aim.y * (lanternLength * 0.4) +
+      planetDirection.y * throwLag * 168 +
+      side.y * sideSign * (66 + sway)
   };
 
   const whiskers = [-1, -1, -1, 1, 1, 1].map((whiskerSide, index) => {
     const row = index % 3;
-    const length = 76 + row * 17 + reach * 10;
+    const length = 70 + row * 18 + reach * 10;
     const root = {
       x:
-        tipX -
-        forward.x * (44 + row * 9) +
-        side.x * whiskerSide * (34 + row * 15),
+        tipX +
+        forward.x * (24 + row * 12) +
+        side.x * whiskerSide * (25 + row * 9),
       y:
-        tipY -
-        forward.y * (44 + row * 9) +
-        side.y * whiskerSide * (34 + row * 15)
+        tipY +
+        forward.y * (24 + row * 12) +
+        side.y * whiskerSide * (25 + row * 9)
     };
-    const direction = mixDirection(
-      idleDirection,
-      {
-        x: forward.x * 0.78 + side.x * whiskerSide * (0.34 + row * 0.08),
-        y: forward.y * 0.78 + side.y * whiskerSide * (0.34 + row * 0.08)
-      },
-      0.56
+    const direction = normalize(
+      forward.x * (0.38 + row * 0.08) +
+        side.x * whiskerSide * (0.9 - row * 0.12),
+      forward.y * (0.38 + row * 0.08) +
+        side.y * whiskerSide * (0.9 - row * 0.12)
     );
     const localSway =
       Math.sin(elapsedMs * (0.004 + row * 0.0005) + index * 1.3) * 6;
@@ -145,16 +151,16 @@ export function getWormHeadAppendagePose({
       control: {
         x:
           root.x +
-          direction.x * (length * 0.44) +
-          planetDirection.x * throwLag * (92 + row * 18),
+          direction.x * (length * 0.46) +
+          planetDirection.x * throwLag * (72 + row * 18),
         y:
           root.y +
-          direction.y * (length * 0.44) +
-          planetDirection.y * throwLag * (92 + row * 18)
+          direction.y * (length * 0.46) +
+          planetDirection.y * throwLag * (72 + row * 18)
       },
       end,
       length,
-      glowAlpha: Math.min(0.48, 0.18 + reach * 0.16 + throwLag * 0.12)
+      glowAlpha: Math.min(0.34, 0.12 + reach * 0.08 + throwLag * 0.08)
     };
   });
 

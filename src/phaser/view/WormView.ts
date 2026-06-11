@@ -25,8 +25,6 @@ export class WormView {
 
   private biteFlash: Phaser.GameObjects.Ellipse;
 
-  private appendageGlow: Phaser.GameObjects.Graphics;
-
   private appendageLines: Phaser.GameObjects.Graphics;
 
   private lanternHalo: Phaser.GameObjects.Ellipse;
@@ -68,9 +66,7 @@ export class WormView {
       .setDepth(104);
     this.biteFlash.setBlendMode(Phaser.BlendModes.ADD);
 
-    this.appendageGlow = scene.add.graphics().setDepth(105);
-    this.appendageGlow.setBlendMode(Phaser.BlendModes.ADD);
-    this.appendageLines = scene.add.graphics().setDepth(106);
+    this.appendageLines = scene.add.graphics().setDepth(102.6);
 
     this.lanternHalo = scene.add
       .ellipse(WORM_ANCHOR_X, WORM_ANCHOR_Y, 76, 76, 0xfff1c7, 0)
@@ -239,37 +235,25 @@ export class WormView {
     });
     const biting = worm.attackPhase === "biting";
 
-    this.appendageGlow.clear();
     this.appendageLines.clear();
 
-    this.appendageGlow.lineStyle(28, 0xfff1c7, pose.lantern.glowAlpha * 0.34);
-    this.drawCurve(this.appendageGlow, pose.lantern);
-    pose.whiskers.forEach((whisker, index) => {
-      this.appendageGlow.lineStyle(
-        8.5 - (index % 3) * 0.8,
-        index < 3 ? 0xfff1d5 : 0xb6c791,
-        whisker.glowAlpha * 0.24
-      );
-      this.drawCurve(this.appendageGlow, whisker);
-    });
-
-    this.appendageLines.lineStyle(10, 0xfff1d5, 0.9);
+    this.appendageLines.lineStyle(8.2, 0xd7a66f, 0.82);
     this.drawCurve(this.appendageLines, pose.lantern);
     pose.whiskers.forEach((whisker, index) => {
       this.appendageLines.lineStyle(
-        4.6 - (index % 3) * 0.35,
-        index < 3 ? 0xfff1d5 : 0xb6c791,
-        0.82
+        3.8 - (index % 3) * 0.25,
+        index < 3 ? 0xc69a68 : 0x8fa06e,
+        0.72
       );
       this.drawCurve(this.appendageLines, whisker);
     });
 
     this.lanternHalo.setPosition(pose.lantern.end.x, pose.lantern.end.y);
-    this.lanternHalo.setScale(biting ? 1.55 : 1.18, biting ? 1.55 : 1.18);
-    this.lanternHalo.setFillStyle(0xfff1c7, pose.lantern.glowAlpha * 0.46);
+    this.lanternHalo.setScale(biting ? 1.38 : 1.12, biting ? 1.38 : 1.12);
+    this.lanternHalo.setFillStyle(0xfff1c7, pose.lantern.glowAlpha * 0.22);
     this.lanternCore.setPosition(pose.lantern.end.x, pose.lantern.end.y);
-    this.lanternCore.setScale(biting ? 1.32 : 1.08);
-    this.lanternCore.setFillStyle(0xfff7dc, 0.92);
+    this.lanternCore.setScale(biting ? 1.18 : 1.02);
+    this.lanternCore.setFillStyle(0xfff7dc, biting ? 0.96 : 0.9);
   }
 
   private drawCurve(
