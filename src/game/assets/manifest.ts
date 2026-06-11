@@ -43,7 +43,26 @@ export const ASSET_MANIFEST: AssetManifest = {
     { key: "sfx-bite-windup", url: "assets/audio/sfx-bite-windup.ogg" },
     { key: "sfx-bite-hit", url: "assets/audio/sfx-bite-hit.ogg" },
     { key: "sfx-bite-miss", url: "assets/audio/sfx-bite-miss.ogg" },
-    { key: "sfx-ship-pass", url: "assets/audio/sfx-ship-pass.ogg" },
+    {
+      key: "ship-engine-falconish",
+      url: "assets/audio/ship-engine-falconish.ogg"
+    },
+    { key: "ship-engine-saucer", url: "assets/audio/ship-engine-saucer.ogg" },
+    { key: "ship-engine-arrow", url: "assets/audio/ship-engine-arrow.ogg" },
+    { key: "ship-engine-ring", url: "assets/audio/ship-engine-ring.ogg" },
+    {
+      key: "ship-engine-triwing",
+      url: "assets/audio/ship-engine-triwing.ogg"
+    },
+    {
+      key: "ship-engine-blockade",
+      url: "assets/audio/ship-engine-blockade.ogg"
+    },
+    { key: "ship-engine-crab", url: "assets/audio/ship-engine-crab.ogg" },
+    {
+      key: "ship-engine-starfish",
+      url: "assets/audio/ship-engine-starfish.ogg"
+    },
     { key: "sfx-satiety-low", url: "assets/audio/sfx-satiety-low.ogg" },
     { key: "sfx-game-over", url: "assets/audio/sfx-game-over.ogg" },
     { key: "sfx-ui-open", url: "assets/audio/sfx-ui-open.ogg" },
@@ -86,8 +105,71 @@ export const ASSET_MANIFEST: AssetManifest = {
         "https://opengameart.org/sites/default/files/kenney_interfaceSounds.zip"
     },
     {
-      key: "sfx-ship-pass",
-      title: "spaceEngine_003.ogg from Sci-Fi Sounds",
+      key: "ship-engine-falconish",
+      title: "spaceEngineSmall_001.ogg from Sci-Fi Sounds",
+      author: "Kenney",
+      license: "CC0 1.0",
+      sourceUrl: "https://kenney.nl/assets/sci-fi-sounds",
+      downloadUrl:
+        "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+    },
+    {
+      key: "ship-engine-saucer",
+      title: "engineCircular_000.ogg from Sci-Fi Sounds",
+      author: "Kenney",
+      license: "CC0 1.0",
+      sourceUrl: "https://kenney.nl/assets/sci-fi-sounds",
+      downloadUrl:
+        "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+    },
+    {
+      key: "ship-engine-arrow",
+      title: "spaceEngineSmall_003.ogg from Sci-Fi Sounds",
+      author: "Kenney",
+      license: "CC0 1.0",
+      sourceUrl: "https://kenney.nl/assets/sci-fi-sounds",
+      downloadUrl:
+        "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+    },
+    {
+      key: "ship-engine-ring",
+      title: "engineCircular_003.ogg from Sci-Fi Sounds",
+      author: "Kenney",
+      license: "CC0 1.0",
+      sourceUrl: "https://kenney.nl/assets/sci-fi-sounds",
+      downloadUrl:
+        "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+    },
+    {
+      key: "ship-engine-triwing",
+      title: "spaceEngine_001.ogg from Sci-Fi Sounds",
+      author: "Kenney",
+      license: "CC0 1.0",
+      sourceUrl: "https://kenney.nl/assets/sci-fi-sounds",
+      downloadUrl:
+        "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+    },
+    {
+      key: "ship-engine-blockade",
+      title: "spaceEngineLarge_002.ogg from Sci-Fi Sounds",
+      author: "Kenney",
+      license: "CC0 1.0",
+      sourceUrl: "https://kenney.nl/assets/sci-fi-sounds",
+      downloadUrl:
+        "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+    },
+    {
+      key: "ship-engine-crab",
+      title: "spaceEngineLow_001.ogg from Sci-Fi Sounds",
+      author: "Kenney",
+      license: "CC0 1.0",
+      sourceUrl: "https://kenney.nl/assets/sci-fi-sounds",
+      downloadUrl:
+        "https://opengameart.org/sites/default/files/sci-fi_sounds.zip"
+    },
+    {
+      key: "ship-engine-starfish",
+      title: "engineCircular_004.ogg from Sci-Fi Sounds",
       author: "Kenney",
       license: "CC0 1.0",
       sourceUrl: "https://kenney.nl/assets/sci-fi-sounds",

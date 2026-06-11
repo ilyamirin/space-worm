@@ -23,6 +23,19 @@ interface ShipMotionPose {
   trailAlphaBoost: number;
 }
 
+interface ShipEngineSound {
+  setPan?: (value: number) => Phaser.Sound.BaseSound;
+  setVolume?: (value: number) => Phaser.Sound.BaseSound;
+  volume?: number;
+}
+
+interface ShipEngineAudio {
+  sound: Phaser.Sound.BaseSound & ShipEngineSound;
+  currentVolume: number;
+  targetVolume: number;
+  retiring: boolean;
+}
+
 export class GameplayScene extends Phaser.Scene {
   private bridge!: SceneBridge;
 
@@ -34,6 +47,8 @@ export class GameplayScene extends Phaser.Scene {
 
   private music?: Phaser.Sound.BaseSound;
 
+  private shipEngineAudio = new Map<string, ShipEngineAudio>();
+
   private previousScore = 0;
 
   private previousPhase = "boot";
@@ -41,10 +56,6 @@ export class GameplayScene extends Phaser.Scene {
   private previousAttackPhase = "idle";
 
   private previousSatiation = 100;
-
-  private knownShipIds = new Set<string>();
-
-  private shipPassCooldownMs = 0;
 
   private lowSatietyCooldownMs = 0;
 
@@ -85,10 +96,10 @@ export class GameplayScene extends Phaser.Scene {
     this.bridge.tick(delta);
     const state = this.bridge.getState();
 
-    this.shipPassCooldownMs = Math.max(0, this.shipPassCooldownMs - delta);
     this.lowSatietyCooldownMs = Math.max(0, this.lowSatietyCooldownMs - delta);
 
     this.syncShips(state.activeShips, state.elapsedMs);
+    this.syncShipEngineAudio(state.activeShips, state.phase);
     this.wormView.sync(state.worm);
     this.parallax.update(state);
     this.syncAudio(state.phase);
@@ -241,6 +252,118 @@ export class GameplayScene extends Phaser.Scene {
         ship.state === "targeted" ? 9 : 7
       );
     });
+  }
+
+  private syncShipEngineAudio(
+    ships: readonly ShipInstance[],
+    phase: string
+  ): void {
+    const canPlay = phase === "running" || phase === "recovering";
+    const contextState =
+      "context" in this.sound && this.sound.context
+        ? this.sound.context.state
+        : "running";
+    const canOutputSound = canPlay && contextState === "running";
+
+    this.shipEngineAudio.forEach((engine) => {
+      engine.retiring = true;
+      engine.targetVolume = 0;
+    });
+
+    const prioritizedShips = ships
+      .filter((ship) => ship.state === "flying")
+      .slice()
+      .sort((left, right) => {
+        const leftCenterDistance = Math.abs(left.x - WORLD_WIDTH / 2);
+        const rightCenterDistance = Math.abs(right.x - WORLD_WIDTH / 2);
+        return leftCenterDistance - rightCenterDistance;
+      })
+      .slice(0, 2);
+
+    const audibleIds = new Set(prioritizedShips.map((ship) => ship.id));
+
+    ships.forEach((ship) => {
+      const archetype = SHIP_ARCHETYPES.find(
+        (item) => item.id === ship.archetypeId
+      );
+      if (!archetype) {
+        return;
+      }
+
+      let engine = this.shipEngineAudio.get(ship.id);
+      if (!engine && canOutputSound) {
+        const sound = this.sound.add(archetype.engineSoundKey, {
+          loop: true,
+          volume: 0
+        }) as Phaser.Sound.BaseSound & ShipEngineSound;
+
+        sound.play({ rate: archetype.enginePlaybackRate });
+
+        engine = {
+          sound,
+          currentVolume: 0,
+          targetVolume: 0,
+          retiring: false
+        };
+        this.shipEngineAudio.set(ship.id, engine);
+      }
+
+      if (!engine) {
+        return;
+      }
+
+      engine.retiring = false;
+
+      const centered =
+        1 - Math.min(1, Math.abs(ship.x - WORLD_WIDTH / 2) / (WORLD_WIDTH / 2));
+      const shouldBeAudible = canOutputSound && audibleIds.has(ship.id);
+      engine.targetVolume = shouldBeAudible
+        ? archetype.engineBaseVolume * (0.45 + centered * 0.55)
+        : 0;
+
+      engine.currentVolume = Phaser.Math.Linear(
+        engine.currentVolume,
+        engine.targetVolume,
+        0.14
+      );
+      this.setShipEngineVolume(engine.sound, engine.currentVolume);
+
+      if (typeof engine.sound.setPan === "function") {
+        const pan = Phaser.Math.Clamp(
+          (ship.x / WORLD_WIDTH) * 1.5 - 0.75,
+          -0.75,
+          0.75
+        );
+        engine.sound.setPan(pan);
+      }
+    });
+
+    this.shipEngineAudio.forEach((engine, shipId) => {
+      if (!engine.retiring) {
+        return;
+      }
+
+      engine.currentVolume = Phaser.Math.Linear(engine.currentVolume, 0, 0.18);
+      this.setShipEngineVolume(engine.sound, engine.currentVolume);
+
+      if (engine.currentVolume <= 0.005) {
+        engine.sound.stop();
+        engine.sound.destroy();
+        this.shipEngineAudio.delete(shipId);
+      }
+    });
+  }
+
+  private setShipEngineVolume(
+    sound: Phaser.Sound.BaseSound & ShipEngineSound,
+    volume: number
+  ): void {
+    if (typeof sound.setVolume === "function") {
+      sound.setVolume(volume);
+      return;
+    }
+
+    sound.volume = volume;
   }
 
   private getPatternCueAlpha(ship: ShipInstance, elapsedMs: number): number {
@@ -425,19 +548,17 @@ export class GameplayScene extends Phaser.Scene {
     if (phase === "gameOver" && this.music.isPlaying) {
       this.music.stop();
     }
+
+    if (phase === "gameOver") {
+      this.shipEngineAudio.forEach((engine) => {
+        engine.sound.stop();
+        engine.sound.destroy();
+      });
+      this.shipEngineAudio.clear();
+    }
   }
 
   private syncFeedback(state: ReturnType<SceneBridge["getState"]>): void {
-    const nextShipIds = new Set(state.activeShips.map((ship) => ship.id));
-    const spawnedShips = state.activeShips.filter(
-      (ship) => !this.knownShipIds.has(ship.id)
-    );
-
-    if (spawnedShips.length > 0 && this.shipPassCooldownMs === 0) {
-      this.sound.play("sfx-ship-pass", { volume: 0.16 });
-      this.shipPassCooldownMs = 900;
-    }
-
     if (
       state.worm.attackPhase === "extending" &&
       this.previousAttackPhase !== "extending"
@@ -470,7 +591,6 @@ export class GameplayScene extends Phaser.Scene {
       this.lowSatietyCooldownMs = 6000;
     }
 
-    this.knownShipIds = nextShipIds;
     this.previousScore = state.score;
     this.previousPhase = state.phase;
     this.previousAttackPhase = state.worm.attackPhase;

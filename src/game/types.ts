@@ -40,6 +40,9 @@ export interface ShipArchetype {
   renderScale: number;
   glowColor: number;
   trailColor: number;
+  engineSoundKey: string;
+  engineBaseVolume: number;
+  enginePlaybackRate: number;
   baseSpeed: number;
   scoreValue: number;
   satiationValue: number;
