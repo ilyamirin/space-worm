@@ -1,19 +1,27 @@
 <svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="ringHull" x1="48" y1="44" x2="274" y2="144" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FBF2FF"/>
-      <stop offset="0.52" stop-color="#C2B4FF"/>
-      <stop offset="1" stop-color="#635A96"/>
+    <linearGradient id="ringHull" x1="37" y1="25" x2="285" y2="153" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5F0FF"/>
+      <stop offset="0.45" stop-color="#C0B7FF"/>
+      <stop offset="1" stop-color="#6656D6"/>
     </linearGradient>
+    <radialGradient id="ringCore" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 90) scale(26)">
+      <stop stop-color="#FFF4D8"/>
+      <stop offset="1" stop-color="#8AF7E0"/>
+    </radialGradient>
   </defs>
-  <circle cx="156" cy="89" r="50" stroke="url(#ringHull)" stroke-width="24"/>
-  <ellipse cx="156" cy="89" rx="20" ry="14" fill="#FFF5D8"/>
-  <path d="M109 52L84 35L102 76" fill="#AC9FF5"/>
-  <path d="M109 126L84 143L102 102" fill="#7C6EC5"/>
-  <path d="M203 52L228 35L210 76" fill="#AC9FF5"/>
-  <path d="M203 126L228 143L210 102" fill="#7C6EC5"/>
-  <path d="M216 88H297" stroke="#CFC2FF" stroke-width="9" stroke-linecap="round"/>
-  <circle cx="256" cy="88" r="14" fill="#A493FF"/>
-  <circle cx="256" cy="88" r="7" fill="#E9E3FF"/>
-  <path d="M296 88L315 79V99L296 88Z" fill="#B9AEFF"/>
+  <path d="M160 18C209 45 250 61 300 90C250 119 209 135 160 162C111 135 70 119 20 90C70 61 111 45 160 18Z" fill="url(#ringHull)"/>
+  <path d="M75 90C105 53 215 53 245 90C214 127 106 127 75 90Z" fill="#17182F"/>
+  <path d="M104 90C126 70 194 70 216 90C194 111 126 111 104 90Z" fill="#9787FF"/>
+  <circle cx="160" cy="90" r="11" fill="url(#ringCore)">
+    <animate attributeName="r" values="9;14;9" dur="1.2s" repeatCount="indefinite"/>
+  </circle>
+  <g>
+    <animateTransform attributeName="transform" type="rotate" from="0 160 90" to="-360 160 90" dur="2.4s" repeatCount="indefinite"/>
+    <circle cx="160" cy="45" r="6" fill="#FFF4D8"/>
+    <circle cx="215" cy="90" r="5" fill="#8AF7E0"/>
+    <circle cx="160" cy="135" r="6" fill="#FFF4D8"/>
+    <circle cx="105" cy="90" r="5" fill="#8AF7E0"/>
+  </g>
+  <path d="M275 85L316 73L316 107L275 96" fill="#9787FF" opacity="0.65"/>
 </svg>

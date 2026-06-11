@@ -1,16 +1,28 @@
 <svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="arrowHull" x1="30" y1="90" x2="300" y2="90" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#D5F7F0"/>
-      <stop offset="0.45" stop-color="#6AD8C4"/>
-      <stop offset="1" stop-color="#274C52"/>
+    <linearGradient id="arrowHull" x1="19" y1="88" x2="292" y2="88" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#59D6C4"/>
+      <stop offset="0.42" stop-color="#BFF8EF"/>
+      <stop offset="1" stop-color="#F6FFFC"/>
+    </linearGradient>
+    <linearGradient id="arrowCharge" x1="22" y1="89" x2="0" y2="89" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8AF7E0"/>
+      <stop offset="1" stop-color="#8AF7E0" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <path d="M34 95L128 52H211L288 90L211 128H128L34 95Z" fill="url(#arrowHull)"/>
-  <path d="M120 52L148 27H232L212 52H120Z" fill="#9FFCEC"/>
-  <path d="M120 128L148 153H232L212 128H120Z" fill="#3A7576"/>
-  <path d="M59 93H239" stroke="#EEFFF8" stroke-width="6" stroke-linecap="round" stroke-opacity="0.7"/>
-  <ellipse cx="188" cy="90" rx="31" ry="12" fill="#16353C"/>
-  <ellipse cx="188" cy="90" rx="18" ry="7" fill="#B6FFEF"/>
-  <path d="M287 90L314 79V101L287 90Z" fill="#74F8DE"/>
+  <path d="M18 90L144 31L302 90L144 149Z" fill="url(#arrowHull)"/>
+  <path d="M143 33L176 90L145 148L114 90Z" fill="#23465C"/>
+  <path d="M61 90L10 59L36 91L11 123Z" fill="#2AAEAA"/>
+  <path d="M220 76L315 48L280 90L315 132L220 105" fill="#ECFFFB"/>
+  <path d="M132 69L190 90L132 111L109 90Z" fill="#1B3145"/>
+  <circle cx="177" cy="90" r="11" fill="#FF94D2"/>
+  <g>
+    <animate attributeName="opacity" values="0.25;0.25;1;0.25" keyTimes="0;0.55;0.75;1" dur="1.55s" repeatCount="indefinite"/>
+    <path d="M19 80L0 66L0 113L19 99Z" fill="url(#arrowCharge)"/>
+    <path d="M45 90L4 78" stroke="#8AF7E0" stroke-width="6" stroke-linecap="round"/>
+    <path d="M45 90L4 102" stroke="#8AF7E0" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <path d="M285 88L320 76L320 104L285 94" fill="#59D6C4">
+    <animate attributeName="opacity" values="0.15;0.85;0.15" dur="1.55s" repeatCount="indefinite"/>
+  </path>
 </svg>

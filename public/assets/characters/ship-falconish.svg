@@ -1,18 +1,32 @@
 <svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="falconHull" x1="42" y1="42" x2="260" y2="146" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFF4D8"/>
-      <stop offset="0.42" stop-color="#C6D8E8"/>
-      <stop offset="1" stop-color="#5C738E"/>
+    <linearGradient id="falconHull" x1="38" y1="34" x2="292" y2="145" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF8E8"/>
+      <stop offset="0.46" stop-color="#CADCEB"/>
+      <stop offset="1" stop-color="#596E87"/>
+    </linearGradient>
+    <linearGradient id="falconFlame" x1="278" y1="86" x2="318" y2="86" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9DEBFF"/>
+      <stop offset="1" stop-color="#4E8CFF" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <path d="M40 93C64 50 123 29 194 37C234 41 269 58 290 86C268 113 234 130 194 143C122 164 67 147 40 93Z" fill="url(#falconHull)"/>
-  <path d="M91 86L39 63L76 98L37 123L92 101" fill="#7C92A6"/>
-  <path d="M206 66L276 43L243 86L278 127L205 112" fill="#A7BACB"/>
-  <ellipse cx="158" cy="91" rx="39" ry="22" fill="#415469"/>
-  <ellipse cx="158" cy="91" rx="24" ry="14" fill="#9DEBFF"/>
-  <path d="M91 78C127 63 181 62 235 76" stroke="#FFF9EA" stroke-width="7" stroke-linecap="round" stroke-opacity="0.7"/>
-  <circle cx="113" cy="107" r="7" fill="#FFCE9F"/>
-  <circle cx="210" cy="102" r="7" fill="#FFCE9F"/>
-  <path d="M274 85L310 75L310 105L274 95" fill="#6CEAFF"/>
+  <g>
+    <animateTransform attributeName="transform" type="rotate" values="-1 160 90;2 160 90;-1 160 90" dur="2.8s" repeatCount="indefinite"/>
+    <path d="M37 93C62 48 125 27 197 37C239 43 273 61 294 88C270 115 235 132 194 144C120 164 65 148 37 93Z" fill="url(#falconHull)"/>
+    <path d="M92 83L34 58L76 98L35 124L94 103" fill="#71879C"/>
+    <path d="M207 65L281 38L245 85L284 129L205 113" fill="#AFC0CF"/>
+    <path d="M73 96C118 68 188 64 251 80" stroke="#FFF9EA" stroke-width="8" stroke-linecap="round" stroke-opacity="0.62"/>
+    <ellipse cx="158" cy="91" rx="42" ry="24" fill="#2D4053"/>
+    <ellipse cx="158" cy="91" rx="25" ry="14" fill="#90D4FF">
+      <animate attributeName="opacity" values="0.72;1;0.72" dur="1.15s" repeatCount="indefinite"/>
+    </ellipse>
+    <path d="M104 108H214" stroke="#40566B" stroke-width="6" stroke-linecap="round" stroke-dasharray="18 12">
+      <animate attributeName="stroke-dashoffset" values="0;-30" dur="1.3s" repeatCount="indefinite"/>
+    </path>
+    <circle cx="112" cy="112" r="7" fill="#FFCE9F"/>
+    <circle cx="211" cy="106" r="7" fill="#FFCE9F"/>
+  </g>
+  <path d="M276 84L319 70L319 102L276 96" fill="url(#falconFlame)">
+    <animate attributeName="opacity" values="0.45;1;0.45" dur="0.8s" repeatCount="indefinite"/>
+  </path>
 </svg>

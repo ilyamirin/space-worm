@@ -1,18 +1,23 @@
 <svg width="320" height="180" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="blockadeHull" x1="46" y1="42" x2="265" y2="139" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#F2FBFF"/>
-      <stop offset="0.46" stop-color="#A8CCE1"/>
-      <stop offset="1" stop-color="#556D82"/>
+    <linearGradient id="blockadeHull" x1="28" y1="43" x2="289" y2="138" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E9FBFF"/>
+      <stop offset="0.42" stop-color="#AEF0FF"/>
+      <stop offset="1" stop-color="#4F7183"/>
     </linearGradient>
   </defs>
-  <path d="M50 95L92 58H223L269 95L223 132H92L50 95Z" fill="url(#blockadeHull)"/>
-  <path d="M108 58L134 28H214L198 58H108Z" fill="#D6E5F0"/>
-  <path d="M108 132L134 154H214L198 132H108Z" fill="#567185"/>
-  <rect x="116" y="74" width="85" height="30" rx="14" fill="#2C4255"/>
-  <rect x="129" y="80" width="58" height="18" rx="9" fill="#A0EEFF"/>
-  <path d="M221 95H296" stroke="#D7EEFF" stroke-width="10" stroke-linecap="round"/>
-  <path d="M294 95L315 84V106L294 95Z" fill="#96D0E7"/>
-  <circle cx="92" cy="95" r="10" fill="#FAD6AA"/>
-  <circle cx="223" cy="95" r="10" fill="#FAD6AA"/>
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 -2;0 4;0 -2" dur="3.8s" repeatCount="indefinite"/>
+    <path d="M30 93C50 35 132 22 223 48C270 61 298 90 304 96C284 124 235 151 156 151C84 151 43 125 30 93Z" fill="url(#blockadeHull)"/>
+    <path d="M66 111C117 132 222 130 274 100" stroke="#315065" stroke-width="14" stroke-linecap="round"/>
+    <path d="M77 65C115 35 196 40 250 75C193 66 125 69 77 65Z" fill="#FFF4D8" opacity="0.86"/>
+    <g>
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1.8s" repeatCount="indefinite"/>
+      <circle cx="111" cy="98" r="13" fill="#FFCE9F"/>
+      <circle cx="202" cy="100" r="13" fill="#FFCE9F"/>
+      <circle cx="154" cy="119" r="8" fill="#FFD68E"/>
+    </g>
+    <path d="M49 91L12 68L28 96L13 124L54 111" fill="#86BFD7"/>
+    <path d="M279 90L319 77L319 111L279 101" fill="#86BFD7" opacity="0.76"/>
+  </g>
 </svg>
