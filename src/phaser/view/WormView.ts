@@ -9,6 +9,14 @@ import {
   getWormHeadAppendagePose,
   type CurveAppendage
 } from "./wormHeadAppendages";
+import type { MoonSatelliteFocus } from "./ParallaxField";
+
+interface LanternTrackingState {
+  x: number;
+  y: number;
+  visibility: number;
+  extension: number;
+}
 
 export class WormView {
   private spineGlow: Phaser.GameObjects.Graphics;
@@ -30,6 +38,14 @@ export class WormView {
   private lanternHalo: Phaser.GameObjects.Ellipse;
 
   private lanternCore: Phaser.GameObjects.Ellipse;
+
+  private lanternFocusX = WORM_ANCHOR_X;
+
+  private lanternFocusY = WORM_ANCHOR_Y - 420;
+
+  private lanternFocusInitialized = false;
+
+  private lanternExtension = 0;
 
   private previousTipX = WORM_ANCHOR_X;
 
@@ -78,7 +94,11 @@ export class WormView {
     this.lanternCore.setBlendMode(Phaser.BlendModes.ADD);
   }
 
-  sync(worm: Readonly<WormState>, elapsedMs = worm.strikeElapsedMs): void {
+  sync(
+    worm: Readonly<WormState>,
+    elapsedMs = worm.strikeElapsedMs,
+    moonFocus?: Readonly<MoonSatelliteFocus>
+  ): void {
     const heading = Phaser.Math.Angle.Between(
       worm.anchorX,
       worm.anchorY,
@@ -199,7 +219,7 @@ export class WormView {
     this.biteFlash.setScale(0.7 + normalized * 0.8, 0.44 + normalized * 0.26);
     this.biteFlash.setFillStyle(0xfff7dc, Math.max(0, flashAlpha));
 
-    this.syncAppendages(worm, heading, normalized, elapsedMs);
+    this.syncAppendages(worm, heading, normalized, elapsedMs, moonFocus);
     this.previousTipX = worm.tipX;
     this.previousTipY = worm.tipY;
     this.previousElapsedMs = elapsedMs;
@@ -209,7 +229,8 @@ export class WormView {
     worm: Readonly<WormState>,
     heading: number,
     normalized: number,
-    elapsedMs: number
+    elapsedMs: number,
+    moonFocus?: Readonly<MoonSatelliteFocus>
   ): void {
     const deltaMs =
       this.previousElapsedMs === null
@@ -219,12 +240,23 @@ export class WormView {
       deltaMs > 0 ? ((worm.tipX - this.previousTipX) / deltaMs) * 1000 : 0;
     const headVelocityY =
       deltaMs > 0 ? ((worm.tipY - this.previousTipY) / deltaMs) * 1000 : 0;
+    const lanternTracking = this.updateLanternTracking(
+      moonFocus,
+      worm.attackPhase === "extending" ||
+        worm.attackPhase === "biting" ||
+        worm.attackPhase === "retracting",
+      deltaMs
+    );
     const pose = getWormHeadAppendagePose({
       attackPhase: worm.attackPhase,
       elapsedMs,
       heading,
       headVelocityX,
       headVelocityY,
+      lanternExtension: lanternTracking.extension,
+      lanternFocusVisibility: lanternTracking.visibility,
+      lanternFocusX: lanternTracking.x,
+      lanternFocusY: lanternTracking.y,
       normalizedReach: normalized,
       planetCenterX: worm.anchorX,
       planetCenterY: worm.anchorY,
@@ -234,21 +266,22 @@ export class WormView {
       tipY: worm.tipY
     });
     const biting = worm.attackPhase === "biting";
-    const lanternTucked =
-      worm.attackPhase === "extending" ||
-      worm.attackPhase === "biting" ||
-      worm.attackPhase === "retracting";
+    const lanternTucked = lanternTracking.extension < 0.16;
 
     this.appendageLines.clear();
 
     if (!lanternTucked) {
-      this.appendageLines.lineStyle(8.2, 0xd7a66f, 0.82);
+      this.appendageLines.lineStyle(
+        8.2,
+        0xd7a66f,
+        0.82 * lanternTracking.extension
+      );
       this.drawCurve(this.appendageLines, pose.lantern);
       pose.whiskers.forEach((whisker, index) => {
         this.appendageLines.lineStyle(
           3.8 - (index % 3) * 0.25,
           index < 3 ? 0xc69a68 : 0x8fa06e,
-          0.72
+          0.72 * lanternTracking.extension
         );
         this.drawCurve(this.appendageLines, whisker);
       });
@@ -270,6 +303,52 @@ export class WormView {
       0xfff7dc,
       lanternTucked ? 0.42 : biting ? 0.96 : 0.9
     );
+  }
+
+  private updateLanternTracking(
+    moonFocus: Readonly<MoonSatelliteFocus> | undefined,
+    attacking: boolean,
+    deltaMs: number
+  ): LanternTrackingState {
+    const deltaSeconds = Phaser.Math.Clamp(deltaMs / 1000, 0, 0.08);
+    const moonVisibility = Phaser.Math.Clamp(moonFocus?.visibility ?? 0, 0, 1);
+    const moonVisible = moonVisibility > 0.05;
+
+    if (moonFocus && moonVisible) {
+      if (!this.lanternFocusInitialized) {
+        this.lanternFocusX = moonFocus.x;
+        this.lanternFocusY = moonFocus.y;
+        this.lanternFocusInitialized = true;
+      } else {
+        const followFactor = 1 - Math.exp(-deltaSeconds * 3.4);
+        this.lanternFocusX = Phaser.Math.Linear(
+          this.lanternFocusX,
+          moonFocus.x,
+          followFactor
+        );
+        this.lanternFocusY = Phaser.Math.Linear(
+          this.lanternFocusY,
+          moonFocus.y,
+          followFactor
+        );
+      }
+    }
+
+    const targetExtension = moonVisible && !attacking ? 1 : 0;
+    const extensionRate = targetExtension > this.lanternExtension ? 2.4 : 12;
+    const extensionFactor = 1 - Math.exp(-deltaSeconds * extensionRate);
+    this.lanternExtension = Phaser.Math.Linear(
+      this.lanternExtension,
+      targetExtension,
+      extensionFactor
+    );
+
+    return {
+      x: this.lanternFocusX,
+      y: this.lanternFocusY,
+      visibility: moonVisibility,
+      extension: this.lanternExtension
+    };
   }
 
   private drawCurve(

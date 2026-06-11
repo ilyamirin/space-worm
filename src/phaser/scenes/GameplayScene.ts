@@ -98,10 +98,14 @@ export class GameplayScene extends Phaser.Scene {
 
     this.lowSatietyCooldownMs = Math.max(0, this.lowSatietyCooldownMs - delta);
 
+    this.parallax.update(state);
     this.syncShips(state.activeShips, state.elapsedMs);
     this.syncShipEngineAudio(state.activeShips, state.phase);
-    this.wormView.sync(state.worm, state.elapsedMs);
-    this.parallax.update(state);
+    this.wormView.sync(
+      state.worm,
+      state.elapsedMs,
+      this.parallax.getMoonSatelliteFocus()
+    );
     this.syncAudio(state.phase);
     this.syncFeedback(state);
   }

@@ -25,6 +25,12 @@ interface PixelComet {
   lifetimeMs: number;
 }
 
+export interface MoonSatelliteFocus {
+  x: number;
+  y: number;
+  visibility: number;
+}
+
 export class ParallaxField {
   private backdrop!: Phaser.GameObjects.Image;
 
@@ -35,6 +41,12 @@ export class ParallaxField {
   private activeComets: PixelComet[] = [];
 
   private moonSatellite!: Phaser.GameObjects.Image;
+
+  private moonSatelliteFocus: MoonSatelliteFocus = {
+    x: WORLD_WIDTH * 0.5,
+    y: WORLD_HEIGHT - 610,
+    visibility: 0
+  };
 
   private bottomGlow!: Phaser.GameObjects.Ellipse;
 
@@ -82,6 +94,10 @@ export class ParallaxField {
     this.lastElapsedMs = state.elapsedMs;
 
     this.updatePixelComets(state.elapsedMs, swayX, swayY);
+  }
+
+  getMoonSatelliteFocus(): MoonSatelliteFocus {
+    return { ...this.moonSatelliteFocus };
   }
 
   private createBackdrop(): void {
@@ -191,6 +207,11 @@ export class ParallaxField {
     this.moonSatellite.setPosition(position.x, position.y);
     this.moonSatellite.setDisplaySize(30 * position.scale, 30 * position.scale);
     this.moonSatellite.setAlpha(position.alpha);
+    this.moonSatelliteFocus = {
+      x: position.x,
+      y: position.y,
+      visibility: position.alpha
+    };
   }
 
   private updatePixelComets(

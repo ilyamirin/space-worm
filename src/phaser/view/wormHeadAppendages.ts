@@ -14,6 +14,10 @@ interface WormHeadAppendageInput {
   normalizedReach: number;
   planetCenterX: number;
   planetCenterY: number;
+  lanternExtension?: number;
+  lanternFocusVisibility?: number;
+  lanternFocusX?: number;
+  lanternFocusY?: number;
   targetX: number;
   targetY: number;
   tipX: number;
@@ -57,6 +61,10 @@ export function getWormHeadAppendagePose({
   headVelocityX,
   headVelocityY,
   normalizedReach,
+  lanternExtension = 1,
+  lanternFocusVisibility = 0,
+  lanternFocusX,
+  lanternFocusY,
   planetCenterX,
   planetCenterY,
   targetX,
@@ -73,14 +81,22 @@ export function getWormHeadAppendagePose({
   };
   const targetDirection = normalize(targetX - tipX, targetY - tipY);
   const planetDirection = normalize(planetCenterX - tipX, planetCenterY - tipY);
+  const focusVisibility = clamp01(lanternFocusVisibility);
+  const focusDirection =
+    typeof lanternFocusX === "number" && typeof lanternFocusY === "number"
+      ? normalize(lanternFocusX - tipX, lanternFocusY - tipY)
+      : null;
   const idleDirection = mixDirection(forward, worldUp, 0.82);
   const targetAim = mixDirection(forward, targetDirection, 0.72);
+  const lanternTrackAim = focusDirection
+    ? mixDirection(idleDirection, focusDirection, focusVisibility * 0.94)
+    : idleDirection;
   const speed = Math.hypot(headVelocityX, headVelocityY);
   const throwLag =
     clamp01(speed / 1800) * (attackPhase === "extending" ? 1 : 0.62);
   const aim =
     attackPhase === "idle" || attackPhase === "recovering"
-      ? idleDirection
+      ? lanternTrackAim
       : mixDirection(targetAim, planetDirection, throwLag * 0.18);
   const sideSign =
     forward.x * targetDirection.y - forward.y * targetDirection.x >= 0 ? 1 : -1;
@@ -100,7 +116,8 @@ export function getWormHeadAppendagePose({
           : biting
             ? 0.1
             : 0.24 + (1 - throwLag) * 0.06;
-  const visibleLanternLength = lanternLength * retraction;
+  const extensionScale = 0.08 + clamp01(lanternExtension) * 0.92;
+  const visibleLanternLength = lanternLength * retraction * extensionScale;
   const lanternRoot = {
     x: tipX - forward.x * 62 + side.x * sideSign * 18,
     y: tipY - forward.y * 62 + side.y * sideSign * 18
