@@ -5,6 +5,10 @@ import {
   WORM_SEGMENTS
 } from "../../game/simulation/config";
 import type { WormState } from "../../game/types";
+import {
+  getWormHeadAppendagePose,
+  type CurveAppendage
+} from "./wormHeadAppendages";
 
 export class WormView {
   private spineGlow: Phaser.GameObjects.Graphics;
@@ -20,6 +24,20 @@ export class WormView {
   private headAura: Phaser.GameObjects.Ellipse;
 
   private biteFlash: Phaser.GameObjects.Ellipse;
+
+  private appendageGlow: Phaser.GameObjects.Graphics;
+
+  private appendageLines: Phaser.GameObjects.Graphics;
+
+  private lanternHalo: Phaser.GameObjects.Ellipse;
+
+  private lanternCore: Phaser.GameObjects.Ellipse;
+
+  private previousTipX = WORM_ANCHOR_X;
+
+  private previousTipY = WORM_ANCHOR_Y;
+
+  private previousElapsedMs: number | null = null;
 
   constructor(scene: Phaser.Scene) {
     this.spineGlow = scene.add.graphics().setDepth(63);
@@ -49,9 +67,22 @@ export class WormView {
       .ellipse(WORM_ANCHOR_X, WORM_ANCHOR_Y, 84, 84, 0xfff1c7, 0)
       .setDepth(104);
     this.biteFlash.setBlendMode(Phaser.BlendModes.ADD);
+
+    this.appendageGlow = scene.add.graphics().setDepth(105);
+    this.appendageGlow.setBlendMode(Phaser.BlendModes.ADD);
+    this.appendageLines = scene.add.graphics().setDepth(106);
+
+    this.lanternHalo = scene.add
+      .ellipse(WORM_ANCHOR_X, WORM_ANCHOR_Y, 76, 76, 0xfff1c7, 0)
+      .setDepth(107);
+    this.lanternHalo.setBlendMode(Phaser.BlendModes.ADD);
+    this.lanternCore = scene.add
+      .ellipse(WORM_ANCHOR_X, WORM_ANCHOR_Y, 42, 42, 0xfff7dc, 0)
+      .setDepth(108);
+    this.lanternCore.setBlendMode(Phaser.BlendModes.ADD);
   }
 
-  sync(worm: Readonly<WormState>): void {
+  sync(worm: Readonly<WormState>, elapsedMs = worm.strikeElapsedMs): void {
     const heading = Phaser.Math.Angle.Between(
       worm.anchorX,
       worm.anchorY,
@@ -171,5 +202,94 @@ export class WormView {
     );
     this.biteFlash.setScale(0.7 + normalized * 0.8, 0.44 + normalized * 0.26);
     this.biteFlash.setFillStyle(0xfff7dc, Math.max(0, flashAlpha));
+
+    this.syncAppendages(worm, heading, normalized, elapsedMs);
+    this.previousTipX = worm.tipX;
+    this.previousTipY = worm.tipY;
+    this.previousElapsedMs = elapsedMs;
+  }
+
+  private syncAppendages(
+    worm: Readonly<WormState>,
+    heading: number,
+    normalized: number,
+    elapsedMs: number
+  ): void {
+    const deltaMs =
+      this.previousElapsedMs === null
+        ? 0
+        : Math.max(16, elapsedMs - this.previousElapsedMs);
+    const headVelocityX =
+      deltaMs > 0 ? ((worm.tipX - this.previousTipX) / deltaMs) * 1000 : 0;
+    const headVelocityY =
+      deltaMs > 0 ? ((worm.tipY - this.previousTipY) / deltaMs) * 1000 : 0;
+    const pose = getWormHeadAppendagePose({
+      attackPhase: worm.attackPhase,
+      elapsedMs,
+      heading,
+      headVelocityX,
+      headVelocityY,
+      normalizedReach: normalized,
+      planetCenterX: worm.anchorX,
+      planetCenterY: worm.anchorY,
+      targetX: worm.targetX,
+      targetY: worm.targetY,
+      tipX: worm.tipX,
+      tipY: worm.tipY
+    });
+    const biting = worm.attackPhase === "biting";
+
+    this.appendageGlow.clear();
+    this.appendageLines.clear();
+
+    this.appendageGlow.lineStyle(28, 0xfff1c7, pose.lantern.glowAlpha * 0.34);
+    this.drawCurve(this.appendageGlow, pose.lantern);
+    pose.whiskers.forEach((whisker, index) => {
+      this.appendageGlow.lineStyle(
+        8.5 - (index % 3) * 0.8,
+        index < 3 ? 0xfff1d5 : 0xb6c791,
+        whisker.glowAlpha * 0.24
+      );
+      this.drawCurve(this.appendageGlow, whisker);
+    });
+
+    this.appendageLines.lineStyle(10, 0xfff1d5, 0.9);
+    this.drawCurve(this.appendageLines, pose.lantern);
+    pose.whiskers.forEach((whisker, index) => {
+      this.appendageLines.lineStyle(
+        4.6 - (index % 3) * 0.35,
+        index < 3 ? 0xfff1d5 : 0xb6c791,
+        0.82
+      );
+      this.drawCurve(this.appendageLines, whisker);
+    });
+
+    this.lanternHalo.setPosition(pose.lantern.end.x, pose.lantern.end.y);
+    this.lanternHalo.setScale(biting ? 1.55 : 1.18, biting ? 1.55 : 1.18);
+    this.lanternHalo.setFillStyle(0xfff1c7, pose.lantern.glowAlpha * 0.46);
+    this.lanternCore.setPosition(pose.lantern.end.x, pose.lantern.end.y);
+    this.lanternCore.setScale(biting ? 1.32 : 1.08);
+    this.lanternCore.setFillStyle(0xfff7dc, 0.92);
+  }
+
+  private drawCurve(
+    graphics: Phaser.GameObjects.Graphics,
+    appendage: CurveAppendage
+  ): void {
+    graphics.beginPath();
+    graphics.moveTo(appendage.root.x, appendage.root.y);
+    for (let step = 1; step <= 8; step += 1) {
+      const t = step / 8;
+      const inverse = 1 - t;
+      graphics.lineTo(
+        inverse * inverse * appendage.root.x +
+          2 * inverse * t * appendage.control.x +
+          t * t * appendage.end.x,
+        inverse * inverse * appendage.root.y +
+          2 * inverse * t * appendage.control.y +
+          t * t * appendage.end.y
+      );
+    }
+    graphics.strokePath();
   }
 }

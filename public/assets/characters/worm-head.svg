@@ -14,13 +14,7 @@
     </radialGradient>
   </defs>
   <path d="M167 28C184 27 199 37 204 51L213 74L188 75L175 58L167 28Z" fill="#6E4729"/>
-  <path d="M204 51L247 18" stroke="#EAE1C7" stroke-width="6" stroke-linecap="round"/>
-  <path d="M195 47L267 43" stroke="#B6C791" stroke-width="7" stroke-linecap="round"/>
-  <path d="M179 46L203 9" stroke="#EDE4D1" stroke-width="6" stroke-linecap="round"/>
   <path d="M137 29C120 29 104 39 100 54L91 75L116 76L129 59L137 29Z" fill="#6E4729"/>
-  <path d="M100 54L58 20" stroke="#EAE1C7" stroke-width="6" stroke-linecap="round"/>
-  <path d="M109 49L38 46" stroke="#B6C791" stroke-width="7" stroke-linecap="round"/>
-  <path d="M125 48L100 10" stroke="#EDE4D1" stroke-width="6" stroke-linecap="round"/>
   <path d="M65 113C72 74 104 48 160 48C216 48 248 74 255 113C259 135 252 159 234 177C215 196 189 206 160 206C131 206 105 196 86 177C68 159 61 135 65 113Z" fill="url(#headShell)"/>
   <path d="M76 116C90 86 118 68 160 68C202 68 230 86 244 116C226 106 196 100 160 100C124 100 94 106 76 116Z" fill="url(#headGlow)"/>
   <path d="M97 98C115 85 136 80 160 80C184 80 205 85 223 98" stroke="#FFF9E7" stroke-width="7" stroke-linecap="round" stroke-opacity="0.72"/>
