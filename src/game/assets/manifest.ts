@@ -11,6 +11,10 @@ export const ASSET_MANIFEST: AssetManifest = {
       key: "worm-jaw-bottom",
       url: `${imageBase}/characters/worm-jaw-bottom.svg`
     },
+    {
+      key: "space-backdrop",
+      url: `${imageBase}/environment/space-backdrop.jpg`
+    },
     { key: "asteroid-lair", url: `${imageBase}/environment/asteroid-lair.svg` },
     { key: "planet-home", url: `${imageBase}/environment/planet-home.svg` },
     { key: "station-spire", url: `${imageBase}/environment/station-spire.svg` },

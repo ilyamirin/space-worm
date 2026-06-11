@@ -2,9 +2,9 @@ export const WORLD_WIDTH = 1080;
 export const WORLD_HEIGHT = 1920;
 
 export const WORM_ANCHOR_X = WORLD_WIDTH / 2;
-export const WORM_ANCHOR_Y = 1450;
+export const WORM_ANCHOR_Y = 1590;
 export const WORM_SEGMENTS = 18;
-export const WORM_MAX_REACH = 1330;
+export const WORM_MAX_REACH = 1490;
 export const WORM_HEAD_CONTACT_RADIUS = 34;
 export const WORM_JAW_CAPTURE_RADIUS = 46;
 export const WORM_JAW_FORWARD_OFFSET = 44;

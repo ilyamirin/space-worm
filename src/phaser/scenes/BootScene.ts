@@ -14,7 +14,12 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     ASSET_MANIFEST.images.forEach((asset) => {
-      this.load.svg(asset.key, asset.url, { width: 512, height: 512 });
+      if (asset.url.endsWith(".svg")) {
+        this.load.svg(asset.key, asset.url, { width: 512, height: 512 });
+        return;
+      }
+
+      this.load.image(asset.key, asset.url);
     });
 
     ASSET_MANIFEST.audio.forEach((asset) => {

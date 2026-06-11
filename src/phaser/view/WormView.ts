@@ -21,15 +21,9 @@ export class WormView {
 
   private biteFlash: Phaser.GameObjects.Ellipse;
 
-  private lair: Phaser.GameObjects.Image;
-
   constructor(scene: Phaser.Scene) {
     this.spineGlow = scene.add.graphics().setDepth(63);
     this.spineGlow.setBlendMode(Phaser.BlendModes.ADD);
-
-    this.lair = scene.add
-      .image(WORM_ANCHOR_X, WORM_ANCHOR_Y + 90, "asteroid-lair")
-      .setDepth(90);
 
     for (let index = 0; index < WORM_SEGMENTS; index += 1) {
       const segment = scene.add
@@ -48,11 +42,11 @@ export class WormView {
       .image(WORM_ANCHOR_X, WORM_ANCHOR_Y, "worm-jaw-bottom")
       .setDepth(103);
     this.headAura = scene.add
-      .ellipse(WORM_ANCHOR_X, WORM_ANCHOR_Y, 180, 80, 0x8fffe5, 0.18)
+      .ellipse(WORM_ANCHOR_X, WORM_ANCHOR_Y, 164, 72, 0x8fffe5, 0.16)
       .setDepth(101);
     this.headAura.setBlendMode(Phaser.BlendModes.ADD);
     this.biteFlash = scene.add
-      .ellipse(WORM_ANCHOR_X, WORM_ANCHOR_Y, 90, 90, 0xfff1c7, 0)
+      .ellipse(WORM_ANCHOR_X, WORM_ANCHOR_Y, 84, 84, 0xfff1c7, 0)
       .setDepth(104);
     this.biteFlash.setBlendMode(Phaser.BlendModes.ADD);
   }
@@ -101,8 +95,8 @@ export class WormView {
         Math.sin(t * 11 + worm.strikeElapsedMs * 0.02) * 12 * normalized;
       const offsetX = Math.cos(heading + Math.PI / 2) * wiggle * (1 - t * 0.64);
       const offsetY = Math.sin(heading + Math.PI / 2) * wiggle * (1 - t * 0.64);
-      const scaleX = 0.9 - t * 0.22;
-      const scaleY = 0.46 - t * 0.16 + normalized * 0.04;
+      const scaleX = 0.88 - t * 0.22;
+      const scaleY = 0.42 - t * 0.15 + normalized * 0.04;
       const segmentX = x + offsetX;
       const segmentY = y + offsetY;
 
@@ -177,8 +171,5 @@ export class WormView {
     );
     this.biteFlash.setScale(0.7 + normalized * 0.8, 0.44 + normalized * 0.26);
     this.biteFlash.setFillStyle(0xfff7dc, Math.max(0, flashAlpha));
-
-    this.lair.setRotation(Math.sin(worm.strikeElapsedMs * 0.006) * 0.015);
-    this.lair.setTint(0x8d6d62, 0x5d4138, 0xb58b77, 0x261820);
   }
 }
